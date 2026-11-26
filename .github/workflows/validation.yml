@@ -25,8 +25,8 @@ jobs:
       - name: ESLint
         run: pnpm lint
       - name: TypeScript
-        run: pnpm exec next typegen && pnpm exec tsc --noEmit
+        run: pnpm typecheck
+      - name: Test
+        run: pnpm test
       - name: Production build
         run: pnpm build
-      # M0: add the mandatory test step when the real test harness is configured.
-      # Introduce a pinned UI audit tool only when UI work requires it.
