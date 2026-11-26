@@ -48,8 +48,9 @@ Before editing any file, run `git branch --show-current` to confirm your active 
 6. **Out-of-Scope Guard:** Do NOT build an in-app student attendance dispute queue, peer-to-peer chat, social feeds, LMS features, or online payments.
 
 ## Mandatory Working Loop
-1. Check `git branch --show-current` and confirm track ownership.
+1. Check `git branch --show-current` and confirm track ownership (`chore/core-*` / `feat/a-*` = `@itsMarchus`; `feat/b-*` = `@Syris-EkzD`).
 2. Output a concise file-level plan before editing non-trivial features.
-3. Write tests covering authorization failures (`403`/`400`/`409`) and happy paths.
-4. Run `pnpm typecheck && pnpm lint` and relevant `pnpm vitest run` checks until green.
-5. Run `git status --short` to verify strict track compliance.
+3. Follow `.agents/skills/ponytail/SKILL.md` (`full` mode) to write the smallest correct change while keeping all validation, security, error handling, and accessibility intact.
+4. Write tests covering authorization failures (`403`/`400`/`409`) and happy paths.
+5. Run `pnpm typecheck && pnpm lint`, relevant `pnpm vitest run` checks, and `git status --short` until green and strictly inside your track.
+6. **Verified Auto-Commit (Feature Branches Only):** Once steps 1–5 pass on a non-`main` branch with zero `.env`/secret files and zero out-of-track edits, stage files strictly by explicit path (`git add <file1> <file2>` — NEVER `git add -A` or `git add .`) and create a Conventional Commit (`feat(scope): ...` / `fix(scope): ...` / `chore(scope): ...`). Never commit broken builds, never commit to `main`, and never force-push.
