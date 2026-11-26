@@ -1,1 +1,55 @@
-* @Syris-EkzD @itsMarchus
+# Default review fallback
+* @itsMarchus
+
+# Locked Shared Core — requires Tech Lead approval
+/src/db/schema/      @itsMarchus
+/drizzle/            @itsMarchus
+/src/lib/auth/       @itsMarchus
+/src/lib/audit.ts    @itsMarchus
+/src/lib/security/   @itsMarchus
+/src/lib/email/      @itsMarchus
+/src/config/         @itsMarchus
+/src/app/globals.css @itsMarchus
+/package.json        @itsMarchus
+/pnpm-lock.yaml      @itsMarchus
+/docs/               @itsMarchus
+/AGENTS.md           @itsMarchus
+/.agents/            @itsMarchus
+/.github/            @itsMarchus
+
+# Track A — Governance, Attendance, Drive & Meetings (@itsMarchus)
+/src/app/(auth)/                @itsMarchus
+/src/app/api/auth/              @itsMarchus
+/src/app/(workspace)/admin/     @itsMarchus
+/src/app/api/admin/             @itsMarchus
+/src/app/(workspace)/directory/ @itsMarchus
+/src/app/(workspace)/scanner/   @itsMarchus
+/src/app/api/attendance/        @itsMarchus
+/src/components/scanner/        @itsMarchus
+/src/app/(workspace)/documents/ @itsMarchus
+/src/app/api/documents/         @itsMarchus
+/src/lib/drive/                 @itsMarchus
+/src/app/(workspace)/meetings/  @itsMarchus
+/src/app/api/meetings/          @itsMarchus
+
+# Track B — Shells, Member Portal, Events, Tasks & Announcements (@Syris-EkzD)
+/src/app/manifest.ts               @Syris-EkzD
+/src/app/sw.ts                     @Syris-EkzD
+/src/app/(portal)/                 @Syris-EkzD
+/src/app/api/portal/               @Syris-EkzD
+/src/components/shells/            @Syris-EkzD
+/src/components/ui/                @Syris-EkzD
+/src/app/(workspace)/dashboard/    @Syris-EkzD
+/src/app/(workspace)/account/      @Syris-EkzD
+/src/app/(workspace)/events/       @Syris-EkzD
+/src/app/api/events/               @Syris-EkzD
+/src/components/event-hub/         @Syris-EkzD
+/src/components/editor/            @Syris-EkzD
+/src/app/(workspace)/tasks/        @Syris-EkzD
+/src/app/api/tasks/                @Syris-EkzD
+/src/app/(workspace)/announcements/ @Syris-EkzD
+/src/app/api/announcements/        @Syris-EkzD
+
+# Track A overrides inside Event Hub (must stay BELOW /src/components/event-hub/)
+/src/components/event-hub/attendance-tab.tsx @itsMarchus
+/src/components/event-hub/documents-tab.tsx  @itsMarchus
