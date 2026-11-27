@@ -113,6 +113,7 @@ const NAV_GROUPS: readonly NavGroup[] = [
                 href: ROUTES.workspace.directory,
                 icon: BookUser,
                 roles: ALL_OPERATIONAL,
+                implementedInM2: true,
             },
             {
                 label: "Account Security",
@@ -131,12 +132,14 @@ const NAV_GROUPS: readonly NavGroup[] = [
                 href: ROUTES.admin.terms,
                 icon: GraduationCap,
                 roles: ALL_OPERATIONAL,
+                implementedInM2: true,
             },
             {
                 label: "Masterlist Import",
                 href: ROUTES.admin.masterlist,
                 icon: FileSpreadsheet,
                 roles: EXEC_AND_ADMIN,
+                implementedInM2: true,
             },
             {
                 label: "Audit Logs",
@@ -419,7 +422,15 @@ export function ShellB({ actor, activeTerm, children }: ShellBProps) {
                                 )}
                             </Button>
                             <span className="text-sm font-medium text-muted-foreground">
-                                {pathname === ROUTES.workspace.account ? "Account Security" : "Workspace"}
+                                {pathname === ROUTES.workspace.account
+                                    ? "Account Security"
+                                    : pathname === ROUTES.admin.terms
+                                      ? "Terms & Officers"
+                                      : pathname === ROUTES.admin.masterlist
+                                        ? "Masterlist Import"
+                                        : pathname === ROUTES.workspace.directory
+                                          ? "Directory"
+                                          : "Workspace"}
                             </span>
                         </div>
 
