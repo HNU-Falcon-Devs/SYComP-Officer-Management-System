@@ -1,4 +1,5 @@
 import "server-only";
+import { randomUUID } from "node:crypto";
 import { Readable } from "node:stream";
 import ExcelJS from "exceljs";
 import Papa from "papaparse";
@@ -10,6 +11,7 @@ import { formatCsvRow } from "@/lib/security/csv-safe";
 
 export const MAX_MASTERLIST_BYTES = 5 * 1024 * 1024;
 export const MAX_MASTERLIST_ROWS = 2_000;
+const MAX_XLSX_SHARED_STRINGS = MAX_MASTERLIST_ROWS * 20;
 
 const FORMULA_PREFIX = /^[=+\-@\t\r]/;
 const STUDENT_ID_PATTERN = /^[A-Za-z0-9-]+$/;
@@ -244,73 +246,179 @@ export async function parseMasterlistBuffer(
     }
 
     if (lower.endsWith(".xlsx")) {
-        type WorkbookReaderInternal = Omit<ExcelJS.stream.xlsx.WorkbookReader, "model"> & {
+        type WorkbookReaderInternal = Omit<ExcelJS.stream.xlsx.WorkbookReader, "model" | "parse"> & {
             model?: { sheets?: unknown[] };
             sharedStrings?: unknown[];
             workbookRels?: unknown[];
+            parse(): AsyncIterableIterator<unknown>;
         };
 
-        // Pass 1: stream xl/sharedStrings.xml only (avoids ExcelJS temp-file buffering when sheet1.xml precedes sharedStrings.xml)
-        const ssReader = new ExcelJS.stream.xlsx.WorkbookReader(Readable.from(buffer), {
-            worksheets: "ignore",
-            sharedStrings: "cache",
-        }) as unknown as WorkbookReaderInternal;
-        ssReader.model = { sheets: [] };
-        ssReader.sharedStrings = [];
-        ssReader.workbookRels = [];
-        for await (const _sheet of ssReader) {
-            void _sheet;
-        }
+        const sentinelPrefix = `\u0000__SS_${randomUUID()}__:`;
+        const neededStringIndices = new Set<number>();
+        const sharedStringProxy = new Proxy([] as unknown[], {
+            get(target, prop, receiver) {
+                if (typeof prop === "string" && /^\d+$/.test(prop)) {
+                    return `${sentinelPrefix}${Number(prop)}`;
+                }
+                return Reflect.get(target, prop, receiver);
+            },
+        });
 
-        // Pass 2: stream first worksheet row-by-row and abort immediately past MAX_MASTERLIST_ROWS
-        const rows: RawMasterlistRow[] = [];
-        let headers: string[] = [];
+        // Pass 1: stream only the first worksheet row-by-row; abort past MAX_MASTERLIST_ROWS before reading sharedStrings.xml
+        const capturedRows: Array<{ rowNumber: number; cells: ExcelJS.CellValue[] }> = [];
         let worksheetProcessed = false;
+        const sheetStream = Readable.from(buffer);
+        sheetStream.on("error", () => {});
 
-        const workbookReader = new ExcelJS.stream.xlsx.WorkbookReader(Readable.from(buffer), {
+        const workbookReader = new ExcelJS.stream.xlsx.WorkbookReader(sheetStream, {
             worksheets: "emit",
             sharedStrings: "ignore",
         }) as unknown as WorkbookReaderInternal;
         workbookReader.model = { sheets: [] };
-        workbookReader.sharedStrings = ssReader.sharedStrings ?? [];
+        workbookReader.sharedStrings = sharedStringProxy;
         workbookReader.workbookRels = [];
 
-        for await (const worksheetReader of workbookReader) {
-            if (worksheetProcessed) {
-                break;
+        try {
+            for await (const worksheetReader of workbookReader) {
+                if (worksheetProcessed) {
+                    break;
+                }
+                worksheetProcessed = true;
+
+                for await (const row of worksheetReader) {
+                    const cells = (
+                        Array.isArray(row.values) ? row.values.slice(1) : []
+                    ) as ExcelJS.CellValue[];
+                    const hasContent = cells.some((v) => {
+                        if (v === null || v === undefined) {
+                            return false;
+                        }
+                        if (typeof v === "string") {
+                            return v.startsWith(sentinelPrefix) || v.trim() !== "";
+                        }
+                        return true;
+                    });
+                    if (!hasContent) {
+                        continue;
+                    }
+
+                    if (capturedRows.length >= MAX_MASTERLIST_ROWS + 1) {
+                        throw new MasterlistParseError(
+                            "TOO_MANY_ROWS",
+                            `Masterlist exceeds the ${MAX_MASTERLIST_ROWS}-row batch limit.`,
+                        );
+                    }
+
+                    for (const cell of cells) {
+                        if (typeof cell === "string" && cell.startsWith(sentinelPrefix)) {
+                            const idx = Number(cell.slice(sentinelPrefix.length));
+                            if (Number.isInteger(idx) && idx >= 0) {
+                                neededStringIndices.add(idx);
+                            }
+                        }
+                    }
+
+                    if (neededStringIndices.size > MAX_XLSX_SHARED_STRINGS) {
+                        throw new MasterlistParseError(
+                            "TOO_MANY_ROWS",
+                            `Masterlist exceeds the ${MAX_MASTERLIST_ROWS}-row batch limit.`,
+                        );
+                    }
+
+                    capturedRows.push({ rowNumber: row.number, cells });
+                }
             }
-            worksheetProcessed = true;
+        } finally {
+            sheetStream.destroy();
+        }
 
-            for await (const row of worksheetReader) {
-                const rawValues = Array.isArray(row.values) ? row.values : [];
-                const cellTexts = rawValues.slice(1).map((v) => extractExcelCellText(v));
-                const isBlankRow = cellTexts.every((cell) => cell.trim() === "");
-                if (isBlankRow) {
-                    continue;
+        if (capturedRows.length === 0) {
+            throw new MasterlistParseError("EMPTY_FILE", "XLSX worksheet has no header row.");
+        }
+
+        // Pass 2: stream xl/sharedStrings.xml selectively and stop as soon as all referenced indices are resolved
+        const resolvedStrings = new Map<number, ExcelJS.CellValue>();
+        if (neededStringIndices.size > 0) {
+            let maxNeededIndex = 0;
+            for (const idx of neededStringIndices) {
+                if (idx > maxNeededIndex) {
+                    maxNeededIndex = idx;
                 }
+            }
 
-                if (headers.length === 0) {
-                    headers = cellTexts;
-                    assertHeaderPresence(headers);
-                    continue;
-                }
+            const ssStream = Readable.from(buffer);
+            ssStream.on("error", () => {});
+            const ssReader = new ExcelJS.stream.xlsx.WorkbookReader(ssStream, {
+                worksheets: "ignore",
+                sharedStrings: "emit",
+            }) as unknown as WorkbookReaderInternal;
+            ssReader.model = { sheets: [] };
+            ssReader.sharedStrings = [];
+            ssReader.workbookRels = [];
 
-                if (rows.length >= MAX_MASTERLIST_ROWS) {
-                    throw new MasterlistParseError(
-                        "TOO_MANY_ROWS",
-                        `Masterlist exceeds the ${MAX_MASTERLIST_ROWS}-row batch limit.`,
-                    );
-                }
-
-                const record: Record<string, string> = {};
-                for (let colIdx = 0; colIdx < headers.length; colIdx++) {
-                    const headerName = headers[colIdx];
-                    if (headerName) {
-                        record[headerName] = cellTexts[colIdx] ?? "";
+            try {
+                for await (const item of ssReader.parse()) {
+                    if (
+                        typeof item === "object" &&
+                        item !== null &&
+                        "index" in item &&
+                        "text" in item &&
+                        typeof (item as { index: unknown }).index === "number"
+                    ) {
+                        const entry = item as { index: number; text: ExcelJS.CellValue };
+                        if (neededStringIndices.has(entry.index)) {
+                            resolvedStrings.set(entry.index, entry.text);
+                        }
+                        if (
+                            resolvedStrings.size >= neededStringIndices.size ||
+                            entry.index >= maxNeededIndex
+                        ) {
+                            break;
+                        }
                     }
                 }
-                rows.push(mapRecordToRawRow(row.number, record));
+            } finally {
+                ssStream.destroy();
             }
+        }
+
+        const rows: RawMasterlistRow[] = [];
+        let headers: string[] = [];
+
+        for (const rawRow of capturedRows) {
+            const cellTexts = rawRow.cells.map((v) => {
+                if (typeof v === "string" && v.startsWith(sentinelPrefix)) {
+                    const idx = Number(v.slice(sentinelPrefix.length));
+                    return extractExcelCellText(resolvedStrings.get(idx) ?? null);
+                }
+                return extractExcelCellText(v);
+            });
+
+            if (cellTexts.every((cell) => cell.trim() === "")) {
+                continue;
+            }
+
+            if (headers.length === 0) {
+                headers = cellTexts;
+                assertHeaderPresence(headers);
+                continue;
+            }
+
+            if (rows.length >= MAX_MASTERLIST_ROWS) {
+                throw new MasterlistParseError(
+                    "TOO_MANY_ROWS",
+                    `Masterlist exceeds the ${MAX_MASTERLIST_ROWS}-row batch limit.`,
+                );
+            }
+
+            const record: Record<string, string> = {};
+            for (let colIdx = 0; colIdx < headers.length; colIdx++) {
+                const headerName = headers[colIdx];
+                if (headerName) {
+                    record[headerName] = cellTexts[colIdx] ?? "";
+                }
+            }
+            rows.push(mapRecordToRawRow(rawRow.rowNumber, record));
         }
 
         if (headers.length === 0) {
