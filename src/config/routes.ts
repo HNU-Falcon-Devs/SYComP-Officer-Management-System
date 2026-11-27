@@ -43,6 +43,8 @@ export const ROUTES = {
             resetConfirm: "/api/auth/password/reset-confirm",
         },
         attendance: {
+            checkpoints: "/api/attendance/checkpoints",
+            records: "/api/attendance/records",
             lookup: "/api/attendance/lookup",
             confirm: "/api/attendance/confirm",
             override: "/api/attendance/override",

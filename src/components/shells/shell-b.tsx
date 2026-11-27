@@ -67,6 +67,7 @@ const NAV_GROUPS: readonly NavGroup[] = [
                 href: ROUTES.workspace.scanner,
                 icon: QrCode,
                 roles: ALL_OPERATIONAL,
+                implementedInM2: true,
             },
         ],
     },
@@ -424,8 +425,10 @@ export function ShellB({ actor, activeTerm, children }: ShellBProps) {
                                 )}
                             </Button>
                             <span className="text-sm font-medium text-muted-foreground">
-                                {pathname === ROUTES.workspace.account
-                                    ? "Account Security"
+                                {pathname === ROUTES.workspace.scanner
+                                    ? "QR Scanner"
+                                    : pathname === ROUTES.workspace.account
+                                      ? "Account Security"
                                     : pathname === ROUTES.admin.terms
                                       ? "Terms & Officers"
                                       : pathname === ROUTES.admin.masterlist
