@@ -38,6 +38,7 @@ export const ROUTES = {
             logout: "/api/auth/logout",
             requestOtp: "/api/auth/email/request-otp",
             verifyOtp: "/api/auth/email/verify-otp",
+            passwordChange: "/api/auth/password/change",
             resetRequest: "/api/auth/password/reset-request",
             resetConfirm: "/api/auth/password/reset-confirm",
         },
