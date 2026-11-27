@@ -169,6 +169,30 @@ describe("authorize() 6-stage RBAC pipeline", () => {
         await expect(
             authorize({ actor: exec }, "checkpoint:manage", { eventStatus: "COMPLETED" }),
         ).rejects.toMatchObject({ status: 409, code: "RESOURCE_LOCKED" });
+
+        // Native SUPER_ADMIN mutation on CLOSED term still requires break-glass + reason
+        await expect(
+            authorize({ actor: superAdmin }, "appointment:manage", { termStatus: "CLOSED" }),
+        ).rejects.toMatchObject({ status: 409, code: "RESOURCE_LOCKED" });
+
+        await expect(
+            authorize(
+                { actor: superAdmin, breakGlass: true, reason: "short" },
+                "appointment:manage",
+                { termStatus: "CLOSED" },
+            ),
+        ).rejects.toMatchObject({ status: 400, code: "BREAK_GLASS_REASON_REQUIRED" });
+
+        const closedOverride = await authorize(
+            {
+                actor: superAdmin,
+                breakGlass: true,
+                reason: "Correcting historical term appointment error.",
+            },
+            "appointment:manage",
+            { termStatus: "CLOSED" },
+        );
+        expect(closedOverride.isBreakGlass).toBe(true);
     });
 
     it("never exposes passwordHash or tokenHash in SafeUserDto / SessionActorDto", () => {

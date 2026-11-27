@@ -212,6 +212,17 @@ export async function authorize(
             resource.meetingStatus === "COMPLETED" || resource.meetingStatus === "CANCELLED";
 
         if (isTermLocked || isEventLocked || isMeetingLocked) {
+            if (actor.systemRole === "SUPER_ADMIN" && ctx.breakGlass === true) {
+                if (!reason || reason.length < 10) {
+                    throw new AuthorizationError(
+                        400,
+                        "BREAK_GLASS_REASON_REQUIRED",
+                        "SUPER_ADMIN break-glass override requires break_glass: true and a reason of at least 10 characters.",
+                    );
+                }
+                isBreakGlass = true;
+            }
+
             const allowHistoricalExecOverride =
                 Boolean(rule.allowExecutiveHistoricalOverride) &&
                 actor.systemRole === "EXECUTIVE" &&
