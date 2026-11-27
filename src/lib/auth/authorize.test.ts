@@ -210,4 +210,32 @@ describe("authorize() 6-stage RBAC pipeline", () => {
         expect(JSON.stringify(sessionActor)).not.toContain("tokenHash");
         expect(AuthorizationError).toBeDefined();
     });
+
+    it("enforces system_settings:view (SUPER_ADMIN only) and document_type:manage (SUPER_ADMIN & EXECUTIVE)", async () => {
+        const superAdmin = makeActor({ id: "sa-1", systemRole: "SUPER_ADMIN" });
+        const exec = makeActor({ id: "exec-1", systemRole: "EXECUTIVE" });
+        const officer = makeActor({ id: "officer-1", systemRole: "OFFICER" });
+        const member = makeActor({ id: "member-1", systemRole: "MEMBER" });
+
+        await expect(authorize({ actor: superAdmin }, "system_settings:view")).resolves.toMatchObject({
+            actor: { id: "sa-1" },
+        });
+        for (const denied of [exec, officer, member]) {
+            await expect(authorize({ actor: denied }, "system_settings:view")).rejects.toMatchObject({
+                status: 403,
+            });
+        }
+
+        await expect(authorize({ actor: superAdmin }, "document_type:manage")).resolves.toMatchObject({
+            isBreakGlass: false,
+        });
+        await expect(authorize({ actor: exec }, "document_type:manage")).resolves.toMatchObject({
+            isBreakGlass: false,
+        });
+        for (const denied of [officer, member]) {
+            await expect(authorize({ actor: denied }, "document_type:manage")).rejects.toMatchObject({
+                status: 403,
+            });
+        }
+    });
 });

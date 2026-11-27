@@ -146,12 +146,14 @@ const NAV_GROUPS: readonly NavGroup[] = [
                 href: ROUTES.admin.auditLogs,
                 icon: ScrollText,
                 roles: EXEC_AND_ADMIN,
+                implementedInM2: true,
             },
             {
                 label: "System Settings",
                 href: ROUTES.admin.settings,
                 icon: Settings,
                 roles: EXEC_AND_ADMIN,
+                implementedInM2: true,
             },
         ],
     },
@@ -430,7 +432,11 @@ export function ShellB({ actor, activeTerm, children }: ShellBProps) {
                                         ? "Masterlist Import"
                                         : pathname === ROUTES.workspace.directory
                                           ? "Directory"
-                                          : "Workspace"}
+                                          : pathname === ROUTES.admin.auditLogs
+                                            ? "Audit Logs"
+                                            : pathname === ROUTES.admin.settings
+                                              ? "System Settings"
+                                              : "Workspace"}
                             </span>
                         </div>
 

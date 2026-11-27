@@ -59,5 +59,8 @@ export const ROUTES = {
         adminMasterlist: "/api/admin/masterlist",
         adminDirectory: "/api/admin/directory",
         adminUsers: "/api/admin/users",
+        adminAuditLogs: "/api/admin/audit-logs",
+        adminDocumentTypes: "/api/admin/document-types",
+        adminSettings: "/api/admin/settings",
     },
 } as const;
