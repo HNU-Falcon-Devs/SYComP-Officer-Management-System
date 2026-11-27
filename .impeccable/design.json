@@ -1,0 +1,609 @@
+{
+    "schemaVersion": 2,
+    "generatedAt": "2026-11-27T20:55:00+08:00",
+    "title": "Design System: SYComP OMS",
+    "extensions": {
+        "colorMeta": {
+            "primary-light": {
+                "role": "primary",
+                "displayName": "Amethyst Ribbon (Light)",
+                "canonical": "#6D28D9",
+                "tonalRamp": [
+                    "#2E1065",
+                    "#4C1D95",
+                    "#5B21B6",
+                    "#6D28D9",
+                    "#7C3AED",
+                    "#8B5CF6",
+                    "#C4B5FD",
+                    "#EDE9FE"
+                ]
+            },
+            "primary-dark": {
+                "role": "primary",
+                "displayName": "Amethyst Ribbon (Dark)",
+                "canonical": "#7C3AED",
+                "tonalRamp": [
+                    "#2E1065",
+                    "#4C1D95",
+                    "#5B21B6",
+                    "#6D28D9",
+                    "#7C3AED",
+                    "#8B5CF6",
+                    "#C4B5FD",
+                    "#EDE9FE"
+                ]
+            },
+            "brand-accent-light": {
+                "role": "primary",
+                "displayName": "Lavender Signal (Light)",
+                "canonical": "#8B5CF6",
+                "tonalRamp": [
+                    "#2E1065",
+                    "#4C1D95",
+                    "#6D28D9",
+                    "#7C3AED",
+                    "#8B5CF6",
+                    "#A78BFA",
+                    "#DDD6FE",
+                    "#F5F3FF"
+                ]
+            },
+            "brand-accent-dark": {
+                "role": "primary",
+                "displayName": "Lavender Signal (Dark)",
+                "canonical": "#A78BFA",
+                "tonalRamp": [
+                    "#2E1065",
+                    "#4C1D95",
+                    "#6D28D9",
+                    "#7C3AED",
+                    "#8B5CF6",
+                    "#A78BFA",
+                    "#DDD6FE",
+                    "#F5F3FF"
+                ]
+            },
+            "brand-soft-light": {
+                "role": "primary",
+                "displayName": "Pale Lilac Wash",
+                "canonical": "#EDE9FE",
+                "tonalRamp": [
+                    "#2D2246",
+                    "#4C1D95",
+                    "#6D28D9",
+                    "#8B5CF6",
+                    "#C4B5FD",
+                    "#DDD6FE",
+                    "#EDE9FE",
+                    "#F5F3FF"
+                ]
+            },
+            "brand-soft-dark": {
+                "role": "primary",
+                "displayName": "Deep Plum Wash",
+                "canonical": "#2D2246",
+                "tonalRamp": [
+                    "#1B142B",
+                    "#2D2246",
+                    "#3F2E63",
+                    "#5B21B6",
+                    "#7C3AED",
+                    "#A78BFA",
+                    "#DDD6FE",
+                    "#EDE9FE"
+                ]
+            },
+            "background-light": {
+                "role": "neutral",
+                "displayName": "Alabaster Mist",
+                "canonical": "#FAFAFC",
+                "tonalRamp": [
+                    "#16151D",
+                    "#343242",
+                    "#5B586B",
+                    "#8D899E",
+                    "#C5C2D4",
+                    "#E4E2EE",
+                    "#F3F2F8",
+                    "#FAFAFC"
+                ]
+            },
+            "background-dark": {
+                "role": "neutral",
+                "displayName": "Graphite Canvas",
+                "canonical": "#121216",
+                "tonalRamp": [
+                    "#0B0B0E",
+                    "#121216",
+                    "#1B1A22",
+                    "#252330",
+                    "#2E2C3B",
+                    "#5B586B",
+                    "#A29FB3",
+                    "#F4F3F8"
+                ]
+            },
+            "surface-light": {
+                "role": "neutral",
+                "displayName": "Pure Ledger White",
+                "canonical": "#FFFFFF",
+                "tonalRamp": [
+                    "#16151D",
+                    "#343242",
+                    "#5B586B",
+                    "#8D899E",
+                    "#C5C2D4",
+                    "#E4E2EE",
+                    "#FAFAFC",
+                    "#FFFFFF"
+                ]
+            },
+            "surface-dark": {
+                "role": "neutral",
+                "displayName": "Charcoal Slate",
+                "canonical": "#1B1A22",
+                "tonalRamp": [
+                    "#0B0B0E",
+                    "#121216",
+                    "#1B1A22",
+                    "#252330",
+                    "#2E2C3B",
+                    "#5B586B",
+                    "#A29FB3",
+                    "#F4F3F8"
+                ]
+            },
+            "surface-subtle-light": {
+                "role": "neutral",
+                "displayName": "Cool Lilac Mist",
+                "canonical": "#F3F2F8",
+                "tonalRamp": [
+                    "#16151D",
+                    "#343242",
+                    "#5B586B",
+                    "#8D899E",
+                    "#C5C2D4",
+                    "#E4E2EE",
+                    "#F3F2F8",
+                    "#FAFAFC"
+                ]
+            },
+            "surface-subtle-dark": {
+                "role": "neutral",
+                "displayName": "Elevated Dusk",
+                "canonical": "#252330",
+                "tonalRamp": [
+                    "#121216",
+                    "#1B1A22",
+                    "#252330",
+                    "#2E2C3B",
+                    "#434054",
+                    "#6D6982",
+                    "#A29FB3",
+                    "#F4F3F8"
+                ]
+            },
+            "border-light": {
+                "role": "neutral",
+                "displayName": "Violet-Tinted Hairline",
+                "canonical": "#E4E2EE",
+                "tonalRamp": [
+                    "#16151D",
+                    "#343242",
+                    "#5B586B",
+                    "#8D899E",
+                    "#B7B4C7",
+                    "#E4E2EE",
+                    "#F3F2F8",
+                    "#FAFAFC"
+                ]
+            },
+            "border-dark": {
+                "role": "neutral",
+                "displayName": "Graphite Hairline",
+                "canonical": "#2E2C3B",
+                "tonalRamp": [
+                    "#121216",
+                    "#1B1A22",
+                    "#252330",
+                    "#2E2C3B",
+                    "#474459",
+                    "#74708A",
+                    "#A29FB3",
+                    "#F4F3F8"
+                ]
+            },
+            "foreground-light": {
+                "role": "neutral",
+                "displayName": "Obsidian Ink",
+                "canonical": "#16151D",
+                "tonalRamp": [
+                    "#0E0D12",
+                    "#16151D",
+                    "#2A2836",
+                    "#434054",
+                    "#5B586B",
+                    "#8D899E",
+                    "#C5C2D4",
+                    "#F4F3F8"
+                ]
+            },
+            "foreground-dark": {
+                "role": "neutral",
+                "displayName": "Cloud Ivory",
+                "canonical": "#F4F3F8",
+                "tonalRamp": [
+                    "#16151D",
+                    "#2E2C3B",
+                    "#5B586B",
+                    "#8D899E",
+                    "#A29FB3",
+                    "#D2D0DE",
+                    "#E4E2EE",
+                    "#F4F3F8"
+                ]
+            },
+            "muted-foreground-light": {
+                "role": "neutral",
+                "displayName": "Graphite Muted",
+                "canonical": "#5B586B",
+                "tonalRamp": [
+                    "#16151D",
+                    "#2A2836",
+                    "#434054",
+                    "#5B586B",
+                    "#78748A",
+                    "#A29FB3",
+                    "#D2D0DE",
+                    "#F3F2F8"
+                ]
+            },
+            "muted-foreground-dark": {
+                "role": "neutral",
+                "displayName": "Silver Slate",
+                "canonical": "#A29FB3",
+                "tonalRamp": [
+                    "#1B1A22",
+                    "#2E2C3B",
+                    "#4B485E",
+                    "#6D6982",
+                    "#8A869E",
+                    "#A29FB3",
+                    "#D2D0DE",
+                    "#F4F3F8"
+                ]
+            },
+            "success-light": {
+                "role": "secondary",
+                "displayName": "Verified Emerald (Light)",
+                "canonical": "#15803D",
+                "tonalRamp": [
+                    "#052E16",
+                    "#14532D",
+                    "#166534",
+                    "#15803D",
+                    "#16A34A",
+                    "#22C55E",
+                    "#86EFAC",
+                    "#DCFCE7"
+                ]
+            },
+            "success-dark": {
+                "role": "secondary",
+                "displayName": "Verified Emerald (Dark)",
+                "canonical": "#22C55E",
+                "tonalRamp": [
+                    "#052E16",
+                    "#14532D",
+                    "#166534",
+                    "#15803D",
+                    "#22C55E",
+                    "#4ADE80",
+                    "#86EFAC",
+                    "#DCFCE7"
+                ]
+            },
+            "warning-light": {
+                "role": "secondary",
+                "displayName": "Amber Hold (Light)",
+                "canonical": "#B45309",
+                "tonalRamp": [
+                    "#451A03",
+                    "#78350F",
+                    "#92400E",
+                    "#B45309",
+                    "#D97706",
+                    "#F59E0B",
+                    "#FCD34D",
+                    "#FEF3C7"
+                ]
+            },
+            "warning-dark": {
+                "role": "secondary",
+                "displayName": "Amber Hold (Dark)",
+                "canonical": "#F59E0B",
+                "tonalRamp": [
+                    "#451A03",
+                    "#78350F",
+                    "#92400E",
+                    "#B45309",
+                    "#D97706",
+                    "#F59E0B",
+                    "#FCD34D",
+                    "#FEF3C7"
+                ]
+            },
+            "destructive-light": {
+                "role": "secondary",
+                "displayName": "Crimson Block (Light)",
+                "canonical": "#B91C1C",
+                "tonalRamp": [
+                    "#450A0A",
+                    "#7F1D1D",
+                    "#991B1B",
+                    "#B91C1C",
+                    "#DC2626",
+                    "#EF4444",
+                    "#FCA5A5",
+                    "#FEE2E2"
+                ]
+            },
+            "destructive-dark": {
+                "role": "secondary",
+                "displayName": "Crimson Block (Dark)",
+                "canonical": "#EF4444",
+                "tonalRamp": [
+                    "#450A0A",
+                    "#7F1D1D",
+                    "#991B1B",
+                    "#B91C1C",
+                    "#DC2626",
+                    "#EF4444",
+                    "#FCA5A5",
+                    "#FEE2E2"
+                ]
+            },
+            "destructive-fill-dark": {
+                "role": "secondary",
+                "displayName": "Crimson Action (Dark Fill)",
+                "canonical": "#DC2626",
+                "tonalRamp": [
+                    "#450A0A",
+                    "#7F1D1D",
+                    "#991B1B",
+                    "#B91C1C",
+                    "#DC2626",
+                    "#EF4444",
+                    "#FCA5A5",
+                    "#FEE2E2"
+                ]
+            },
+            "info-light": {
+                "role": "secondary",
+                "displayName": "Cobalt Progress (Light)",
+                "canonical": "#1D4ED8",
+                "tonalRamp": [
+                    "#172554",
+                    "#1E3A8A",
+                    "#1E40AF",
+                    "#1D4ED8",
+                    "#2563EB",
+                    "#60A5FA",
+                    "#93C5FD",
+                    "#DBEAFE"
+                ]
+            },
+            "info-dark": {
+                "role": "secondary",
+                "displayName": "Cobalt Progress (Dark)",
+                "canonical": "#60A5FA",
+                "tonalRamp": [
+                    "#172554",
+                    "#1E3A8A",
+                    "#1E40AF",
+                    "#1D4ED8",
+                    "#3B82F6",
+                    "#60A5FA",
+                    "#93C5FD",
+                    "#DBEAFE"
+                ]
+            }
+        },
+        "typographyMeta": {
+            "headline": {
+                "displayName": "Headline (h1)",
+                "purpose": "Page titles across Shell A and Shell B views."
+            },
+            "title": {
+                "displayName": "Title (h2)",
+                "purpose": "Major workspace section headers and modal/drawer titles."
+            },
+            "card-title": {
+                "displayName": "Card Title (h3)",
+                "purpose": "Dashboard widgets, committee cards, and QR Verification Card student names."
+            },
+            "body": {
+                "displayName": "Body",
+                "purpose": "Standard prose, table cells, form inputs, and proposal content."
+            },
+            "label": {
+                "displayName": "Label",
+                "purpose": "Micro-metadata, form captions, status badge text, and sidebar group headers."
+            },
+            "mono": {
+                "displayName": "Monospace Identifiers",
+                "purpose": "student_id_number, academic_terms.code, scan timestamps, Drive paths, and audit keys."
+            }
+        },
+        "shadows": [
+            {
+                "name": "overlay-sm",
+                "value": "0 4px 12px rgba(18, 18, 22, 0.08)",
+                "purpose": "Floating dropdown menus, tooltips, and Sonner toast alerts in Light mode."
+            },
+            {
+                "name": "overlay-md",
+                "value": "0 12px 32px rgba(18, 18, 22, 0.14)",
+                "purpose": "Centered Dialog modals, Break-Glass confirmation dialogs, and mobile Drawers."
+            }
+        ],
+        "motion": [
+            {
+                "name": "ease-standard",
+                "value": "cubic-bezier(0.2, 0, 0, 1)",
+                "purpose": "Crisp, zero-bounce easing for button states, sidebar collapse, and dialogs."
+            },
+            {
+                "name": "duration-fast",
+                "value": "150ms",
+                "purpose": "Hover tint transitions, focus rings, and QR Verification Card state swaps."
+            },
+            {
+                "name": "duration-normal",
+                "value": "220ms",
+                "purpose": "Desktop sidebar expand/collapse and responsive Sheet/Drawer transitions."
+            },
+            {
+                "name": "pulse-live",
+                "value": "2000ms infinite ease-in-out",
+                "purpose": "Subtle active dot indicator on OPEN attendance checkpoint badges."
+            }
+        ],
+        "breakpoints": [
+            {
+                "name": "md",
+                "value": "768px"
+            },
+            {
+                "name": "lg",
+                "value": "1024px"
+            },
+            {
+                "name": "portal-max",
+                "value": "1024px"
+            }
+        ]
+    },
+    "components": [
+        {
+            "name": "Primary Button",
+            "kind": "button",
+            "refersTo": "button-primary",
+            "description": "Primary governance CTA rendered in Amethyst Ribbon with high-contrast white text.",
+            "html": "<button class=\"ds-btn-primary\" type=\"button\">Confirm Attendance</button>",
+            "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 10px 16px; border: 1px solid #6D28D9; border-radius: 8px; background: #6D28D9; color: #FFFFFF; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 14px; font-weight: 500; line-height: 1; cursor: pointer; transition: background-color 150ms cubic-bezier(0.2, 0, 0, 1), border-color 150ms cubic-bezier(0.2, 0, 0, 1); } .ds-btn-primary:hover { background: #5B21B6; border-color: #5B21B6; } .ds-btn-primary:focus-visible { outline: 2px solid #8B5CF6; outline-offset: 2px; } .ds-btn-primary:active { background: #4C1D95; }"
+        },
+        {
+            "name": "Secondary Button",
+            "kind": "button",
+            "refersTo": "button-secondary",
+            "description": "Calm secondary action for cancel, rescan, and filter triggers with a 1px structural border.",
+            "html": "<button class=\"ds-btn-secondary\" type=\"button\">Cancel / Rescan</button>",
+            "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 10px 16px; border: 1px solid #E4E2EE; border-radius: 8px; background: #F3F2F8; color: #16151D; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 14px; font-weight: 500; line-height: 1; cursor: pointer; transition: background-color 150ms cubic-bezier(0.2, 0, 0, 1), border-color 150ms cubic-bezier(0.2, 0, 0, 1); } .ds-btn-secondary:hover { background: #E9E6F5; border-color: #D2CEE3; } .ds-btn-secondary:focus-visible { outline: 2px solid #8B5CF6; outline-offset: 2px; } .ds-btn-secondary:active { background: #DFDBF0; }"
+        },
+        {
+            "name": "Destructive Button",
+            "kind": "button",
+            "refersTo": "button-destructive",
+            "description": "High-consequence Light-mode action button using Crimson Block (#B91C1C) fill with #FFFFFF text (6.47:1 AA contrast), reserved for account disablement, proposal rejection, or break-glass overrides.",
+            "html": "<button class=\"ds-btn-destructive\" type=\"button\">Reject Proposal</button>",
+            "css": ".ds-btn-destructive { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 10px 16px; border: 1px solid #B91C1C; border-radius: 8px; background: #B91C1C; color: #FFFFFF; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 14px; font-weight: 500; line-height: 1; cursor: pointer; transition: background-color 150ms cubic-bezier(0.2, 0, 0, 1); } .ds-btn-destructive:hover { background: #991B1B; } .ds-btn-destructive:focus-visible { outline: 2px solid #8B5CF6; outline-offset: 2px; } .ds-btn-destructive:active { background: #7F1D1D; }"
+        },
+        {
+            "name": "Destructive Button (Dark)",
+            "kind": "button",
+            "refersTo": "button-destructive-dark",
+            "description": "High-consequence Dark-mode action button using Crimson Action (#DC2626) fill with #FFFFFF text (4.83:1 AA contrast), reserving #EF4444 for dark status accents and borders.",
+            "html": "<button class=\"ds-btn-destructive-dark\" type=\"button\">Reject Proposal</button>",
+            "css": ".ds-btn-destructive-dark { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 10px 16px; border: 1px solid #DC2626; border-radius: 8px; background: #DC2626; color: #FFFFFF; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 14px; font-weight: 500; line-height: 1; cursor: pointer; transition: background-color 150ms cubic-bezier(0.2, 0, 0, 1); } .ds-btn-destructive-dark:hover { background: #B91C1C; border-color: #B91C1C; } .ds-btn-destructive-dark:focus-visible { outline: 2px solid #A78BFA; outline-offset: 2px; } .ds-btn-destructive-dark:active { background: #991B1B; border-color: #991B1B; }"
+        },
+        {
+            "name": "Text Input",
+            "kind": "input",
+            "refersTo": "input",
+            "description": "Monospace-ready operational input field with 1px structural hairline border and Lavender Signal focus ring.",
+            "html": "<div class=\"ds-field\"><label class=\"ds-label\" for=\"ds-student-id\">Student ID Number</label><input id=\"ds-student-id\" class=\"ds-input\" type=\"text\" value=\"2024-01234\" /></div>",
+            "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; width: 260px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; } .ds-label { font-size: 12px; font-weight: 500; color: #16151D; } .ds-input { height: 40px; padding: 8px 12px; border: 1px solid #E4E2EE; border-radius: 8px; background: #F3F2F8; color: #16151D; font-family: \"JetBrains Mono\", ui-monospace, SFMono-Regular, monospace; font-size: 13px; font-weight: 500; transition: border-color 150ms cubic-bezier(0.2, 0, 0, 1), background-color 150ms cubic-bezier(0.2, 0, 0, 1); } .ds-input:hover { border-color: #C7C2DA; } .ds-input:focus-visible { outline: 2px solid #8B5CF6; outline-offset: 0; background: #FFFFFF; border-color: #6D28D9; }"
+        },
+        {
+            "name": "Status Badge",
+            "kind": "chip",
+            "refersTo": "status-badge",
+            "description": "Unified domain status pill pairing tinted semantic background, 1px hairline, inline SVG icon, and label.",
+            "html": "<span class=\"ds-badge-published\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20\"/><path d=\"M2 12h20\"/></svg>PUBLISHED</span>",
+            "css": ".ds-badge-published { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border: 1px solid rgba(21, 128, 61, 0.25); border-radius: 9999px; background: rgba(21, 128, 61, 0.1); color: #15803D; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 12px; font-weight: 500; line-height: 1.2; letter-spacing: 0.01em; }"
+        },
+        {
+            "name": "Sidebar Nav Item",
+            "kind": "nav",
+            "refersTo": "sidebar-nav",
+            "description": "Shell B collapsible sidebar link using Pale Lilac Wash active tint and Lavender Signal icon accent.",
+            "html": "<a class=\"ds-nav-item\" href=\"#scanner\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#8B5CF6\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect width=\"5\" height=\"5\" x=\"3\" y=\"3\" rx=\"1\"/><rect width=\"5\" height=\"5\" x=\"16\" y=\"3\" rx=\"1\"/><rect width=\"5\" height=\"5\" x=\"3\" y=\"16\" rx=\"1\"/><path d=\"M21 16h-3a2 2 0 0 0-2 2v3\"/><path d=\"M21 21v.01\"/><path d=\"M12 7v3a2 2 0 0 1-2 2H7\"/><path d=\"M3 12h.01\"/><path d=\"M12 3h.01\"/><path d=\"M12 16v.01\"/><path d=\"M16 12h1\"/><path d=\"M21 12v.01\"/><path d=\"M12 21v-1\"/></svg><span>QR Scanner</span></a>",
+            "css": ".ds-nav-item { display: flex; align-items: center; gap: 10px; width: 224px; height: 40px; padding: 10px 12px; border-radius: 8px; background: #EDE9FE; color: #6D28D9; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 14px; font-weight: 500; text-decoration: none; transition: background-color 150ms cubic-bezier(0.2, 0, 0, 1); } .ds-nav-item:hover { background: #E4DDFC; } .ds-nav-item:focus-visible { outline: 2px solid #8B5CF6; outline-offset: 2px; }"
+        },
+        {
+            "name": "QR Verification Card (Ready)",
+            "kind": "custom",
+            "refersTo": "verification-card-ready",
+            "description": "Step 2 /scanner Verification Card in READY state with 2px Emerald border, monospace ID, and explicit Confirm gate.",
+            "html": "<div class=\"ds-verify-card\"><div class=\"ds-verify-head\"><div><div class=\"ds-verify-name\">Juan Dela Cruz</div><div class=\"ds-verify-meta\">ID: <span class=\"ds-mono\">2024-01234</span> &bull; Role: MEMBER</div></div><span class=\"ds-badge-active\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\"/><path d=\"m9 12 2 2 4-4\"/></svg>ACTIVE</span></div><div class=\"ds-verify-checkpoint\">Checkpoint: <strong>AM In</strong> &bull; Status: Ready to confirm</div><div class=\"ds-verify-actions\"><button class=\"ds-vc-cancel\" type=\"button\">Cancel / Rescan</button><button class=\"ds-vc-confirm\" type=\"button\">Confirm Attendance</button></div></div>",
+            "css": ".ds-verify-card { width: 340px; padding: 16px; border: 2px solid #15803D; border-radius: 14px; background: #FFFFFF; color: #16151D; font-family: Inter, ui-sans-serif, system-ui, sans-serif; display: flex; flex-direction: column; gap: 12px; } .ds-verify-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; } .ds-verify-name { font-size: 16px; font-weight: 600; line-height: 1.3; } .ds-verify-meta { margin-top: 2px; font-size: 13px; color: #5B586B; } .ds-mono { font-family: \"JetBrains Mono\", ui-monospace, SFMono-Regular, monospace; font-weight: 500; color: #16151D; } .ds-badge-active { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border: 1px solid rgba(21, 128, 61, 0.25); border-radius: 9999px; background: rgba(21, 128, 61, 0.1); color: #15803D; font-size: 12px; font-weight: 500; } .ds-verify-checkpoint { padding: 8px 10px; border: 1px solid #E4E2EE; border-radius: 8px; background: #F3F2F8; font-size: 13px; color: #16151D; } .ds-verify-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; } .ds-vc-cancel { height: 44px; padding: 10px 12px; border: 1px solid #E4E2EE; border-radius: 8px; background: #F3F2F8; color: #16151D; font-size: 13px; font-weight: 500; cursor: pointer; } .ds-vc-cancel:hover { background: #E9E6F5; } .ds-vc-cancel:focus-visible { outline: 2px solid #8B5CF6; outline-offset: 2px; } .ds-vc-confirm { height: 44px; padding: 10px 12px; border: 1px solid #6D28D9; border-radius: 8px; background: #6D28D9; color: #FFFFFF; font-size: 13px; font-weight: 500; cursor: pointer; } .ds-vc-confirm:hover { background: #5B21B6; } .ds-vc-confirm:focus-visible { outline: 2px solid #8B5CF6; outline-offset: 2px; }"
+        }
+    ],
+    "narrative": {
+        "northStar": "The Operations Ledger",
+        "overview": "SYComP OMS is designed as a crisp, disciplined institutional SaaS ledger for the Society of Young Computer Professionals (SYComP) at Holy Name University. Its visual authority comes directly from the official SYComP banner (`docs/inspo/Banner.png`)—deep graphite-charcoal surfaces, isometric amethyst-violet ribbon geometry, pale lilac highlights, and razor-sharp contrast—translated into a restrained Light and Dark UI built on Shadcn/ui primitives and Tailwind CSS v4 tokens.\n\nEvery surface favors clarity, scanability, and fast accountability over ornament: crisp 1px structural borders separate containers without heavy drop shadows, operational identifiers snap cleanly in monospace, and the signature amethyst accent signals active controls and primary governance actions without visual fatigue. Operational screens strictly reject neon glows, frosted glassmorphism, decorative circuit-pattern backgrounds, marketing gradients, and emojis anywhere in the interface.\n\nImplementation note: `src/app/globals.css` currently retains the M0 neutral Shadcn scaffolding (`--radius: 0.625rem` / `10px`) until M1/M2 UI wiring binds these normative SYComP Light and Dark tokens.",
+        "keyCharacteristics": [
+            "Refined, restrained institutional SaaS built on 1px borders and tonal surface stepping rather than decorative shadows.",
+            "Signature amethyst-violet (`Amethyst Ribbon`) primary actions balanced against cool alabaster daylight and deep `Graphite Canvas` dark surfaces.",
+            "Strictly zero emojis across all UI surfaces; every semantic signifier pairs a crisp `lucide-react` icon with explicit text.",
+            "Dual-Shell separation isolating the mobile-first General Member Portal (Shell A) from the collapsible-sidebar Officer/Executive/Admin Workspace (Shell B).",
+            "Monospace precision (`JetBrains Mono`) for `student_id_number`, `academic_terms.code`, scan timestamps, and audit keys."
+        ],
+        "rules": [
+            {
+                "name": "The Amethyst Restraint Rule",
+                "body": "Amethyst Ribbon and Lavender Signal occupy at most 10% of any viewport—reserved strictly for primary CTAs, active navigation states, focus rings, and stepper indicators so semantic Emerald, Amber, and Crimson alerts stay unmistakable.",
+                "section": "colors"
+            },
+            {
+                "name": "The Dual-Theme Parity Rule",
+                "body": "Every surface, border, and status token must map cleanly between Light (`Alabaster Mist`) and Dark (`Graphite Canvas`) via CSS custom properties (`next-themes`: `Light` / `Dark` / `System`), defaulting to OS preference without hardcoded hex overrides in components.",
+                "section": "colors"
+            },
+            {
+                "name": "The Monospace Identifier Rule",
+                "body": "Format `student_id_number` (e.g., `2024-01234`), `academic_terms.code` (e.g., `AY2026-2027-S1`), exact scan timestamps, Google Drive folder preview paths, and `audit_logs` action keys in `JetBrains Mono` (`font-mono`) with tabular spacing so dense rows scan without column jitter.",
+                "section": "typography"
+            },
+            {
+                "name": "The Dual-Shell Boundary Rule",
+                "body": "Never leak Shell B sidebar chrome, governance counters, or operational shortcuts into Shell A (`/portal/*`), and never render mobile bottom tab bars inside Shell B—each shell owns one unambiguous navigation model.",
+                "section": "layout"
+            },
+            {
+                "name": "The Flat-By-Default Rule",
+                "body": "Resting cards, tables, sidebars, and verification panels stay strictly flat with 1px structural borders; elevation shadows appear solely on transient overlay surfaces above the page plane.",
+                "section": "elevation"
+            }
+        ],
+        "dos": [
+            "**Do** use `lucide-react` icons (`1.75px` stroke, `16px` inline, `20px` nav/buttons) paired with text labels for every status, action, and empty state.",
+            "**Do** render `student_id_number`, `academic_terms.code`, timestamps, Drive folder paths, and `audit_logs` keys in `JetBrains Mono` (`font-mono`).",
+            "**Do** keep `Amethyst Ribbon` and `Lavender Signal` accents under 10% of the viewport so status badges and QR Verification Card alerts read instantly.",
+            "**Do** enforce `44px x 44px` minimum mobile touch targets, safe-area insets, responsive `Drawer` (`< 768px`) / `Dialog` (`>= 768px`) overlays, and `Skeleton` loading states.",
+            "**Do** maintain strict 1px structural borders (`--border`) and flat-by-default card surfaces across both Light (`Alabaster Mist`) and Dark (`Graphite Canvas`) themes.",
+            "**Do** pause camera decoding and require explicit human verification via the 5-state QR Verification Card before committing any attendance scan."
+        ],
+        "donts": [
+            "**Don't** place emojis anywhere in JSX, navigation labels, status pills, empty states, headings, or `Sonner` toasts.",
+            "**Don't** introduce neon glows, frosted glassmorphism, decorative circuit-pattern backgrounds, or marketing gradients onto operational workspace or portal screens.",
+            "**Don't** convey status by color alone—every state pill and QR Verification Card must pair color with explicit text and a distinct `lucide-react` icon.",
+            "**Don't** render Shell B sidebar chrome inside `/portal/*` or render Shell A mobile bottom navigation inside Shell B.",
+            "**Don't** queue offline QR attendance confirmations in the Service Worker or allow `Confirm Attendance` submissions while `navigator.onLine === false`.",
+            "**Don't** hardcode light or dark hex values inside UI components—reference semantic CSS variables (`--background`, `--card`, `--primary`, `--border`, `--success`, `--warning`, `--destructive`, `--info`).",
+            "**Don't** bypass the mandatory 10-character audit justification modal when `SUPER_ADMIN` performs an Executive-scoped break-glass action."
+        ]
+    }
+}
