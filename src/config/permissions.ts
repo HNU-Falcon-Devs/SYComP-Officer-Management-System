@@ -48,7 +48,8 @@ export type Permission =
     | "announcement:publish"
     | "announcement:public:view"
     | "announcement:officers:view"
-    | "audit_log:view";
+    | "audit_log:view"
+    | "system_settings:view";
 
 export interface PermissionRule {
     nativeRoles: readonly SystemRole[];
@@ -130,4 +131,5 @@ export const PERMISSIONS: Record<Permission, PermissionRule> = {
     "announcement:public:view": ALL_ACTIVE_SELF_OR_PUBLIC_VIEW,
     "announcement:officers:view": OFFICER_PLUS_VIEW,
     "audit_log:view": { nativeRoles: ["SUPER_ADMIN", "EXECUTIVE"], allowBreakGlass: false, isMutation: false },
+    "system_settings:view": { nativeRoles: ["SUPER_ADMIN"], allowBreakGlass: false, isMutation: false },
 };
