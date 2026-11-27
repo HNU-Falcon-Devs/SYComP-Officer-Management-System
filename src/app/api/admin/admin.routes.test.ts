@@ -328,15 +328,33 @@ describe.skipIf(!directUrl)("M2A admin Terms, Masterlist, and Directory routes (
             { params: Promise.resolve({ id: termA.id }) },
         );
         expect(lockedAppt.status).toBe(409);
+        expect(await lockedAppt.json()).toMatchObject({ error: { code: "RESOURCE_LOCKED" } });
+
+        // Closed term A rejects break-glass POST when reason < 10 chars (400)
+        const shortBgAppt = await appointmentsPost(
+            makeRequest(`/api/admin/terms/${termA.id}/appointments`, "POST", {
+                userId: preStaged.id,
+                positionTitle: "Too Short",
+                grantedSystemRole: "OFFICER",
+                breakGlass: true,
+                reason: "short",
+            }),
+            { params: Promise.resolve({ id: termA.id }) },
+        );
+        expect(shortBgAppt.status).toBe(400);
+        expect(await shortBgAppt.json()).toMatchObject({
+            error: { code: "BREAK_GLASS_REASON_REQUIRED" },
+        });
 
         // Closed term A allows break-glass with >= 10 char reason and flags audit log
+        const bgPostReason = "Recording missed appointment from previous semester.";
         const bgAppt = await appointmentsPost(
             makeRequest(`/api/admin/terms/${termA.id}/appointments`, "POST", {
                 userId: preStaged.id,
                 positionTitle: "Historical Correction",
                 grantedSystemRole: "OFFICER",
                 breakGlass: true,
-                reason: "Recording missed appointment from previous semester.",
+                reason: bgPostReason,
             }),
             { params: Promise.resolve({ id: termA.id }) },
         );
@@ -346,8 +364,55 @@ describe.skipIf(!directUrl)("M2A admin Terms, Masterlist, and Directory routes (
         const [bgAudit] = await conn.db
             .select()
             .from(auditLogs)
-            .where(eq(auditLogs.entityId, bgId));
+            .where(and(eq(auditLogs.entityId, bgId), eq(auditLogs.action, "OFFICER_APPOINTED")));
+        expect(bgAudit.reason).toBe(bgPostReason);
         expect(bgAudit.afterState).toMatchObject({ break_glass: true });
+
+        // Closed term A also enforces break-glass on PATCH appointment end
+        await conn.db
+            .update(officerAppointments)
+            .set({ isCurrent: true, endedAt: null })
+            .where(eq(officerAppointments.id, bgId));
+
+        const lockedEndPatch = await endAppointmentPatch(
+            makeRequest(`/api/admin/terms/${termA.id}/appointments/${bgId}`, "PATCH", {
+                action: "END",
+            }),
+            { params: Promise.resolve({ id: termA.id, appointmentId: bgId }) },
+        );
+        expect(lockedEndPatch.status).toBe(409);
+        expect(await lockedEndPatch.json()).toMatchObject({ error: { code: "RESOURCE_LOCKED" } });
+
+        const shortEndPatch = await endAppointmentPatch(
+            makeRequest(`/api/admin/terms/${termA.id}/appointments/${bgId}`, "PATCH", {
+                action: "END",
+                breakGlass: true,
+                reason: "too short",
+            }),
+            { params: Promise.resolve({ id: termA.id, appointmentId: bgId }) },
+        );
+        expect(shortEndPatch.status).toBe(400);
+        expect(await shortEndPatch.json()).toMatchObject({
+            error: { code: "BREAK_GLASS_REASON_REQUIRED" },
+        });
+
+        const bgEndReason = "Closing missed historical appointment record.";
+        const bgEndPatch = await endAppointmentPatch(
+            makeRequest(`/api/admin/terms/${termA.id}/appointments/${bgId}`, "PATCH", {
+                action: "END",
+                breakGlass: true,
+                reason: bgEndReason,
+            }),
+            { params: Promise.resolve({ id: termA.id, appointmentId: bgId }) },
+        );
+        expect(bgEndPatch.status).toBe(200);
+
+        const [bgEndAudit] = await conn.db
+            .select()
+            .from(auditLogs)
+            .where(and(eq(auditLogs.entityId, bgId), eq(auditLogs.action, "OFFICER_ENDED")));
+        expect(bgEndAudit.reason).toBe(bgEndReason);
+        expect(bgEndAudit.afterState).toMatchObject({ break_glass: true });
 
         // End appointment on term B (active) -> downgrades preStaged and returns empty committees list
         const termBAppts = await appointmentsGet(
@@ -374,6 +439,7 @@ describe.skipIf(!directUrl)("M2A admin Terms, Masterlist, and Directory routes (
     it("imports 100 masterlist students (AC-01), skips re-imports with 0 dupes, flags non-ACTIVE warnings, and exports safe CSV", async () => {
         const superAdmin = await createTestUser("SUPER_ADMIN");
         const existingDisabled = await createTestUser("MEMBER", "DISABLED");
+        const existingNeedsReview = await createTestUser("MEMBER", "NEEDS_REVIEW");
         await signInAs(superAdmin);
 
         const prefix = randomUUID().slice(0, 4).toUpperCase();
@@ -382,6 +448,7 @@ describe.skipIf(!directUrl)("M2A admin Terms, Masterlist, and Directory routes (
             csvLines.push(`M100-${prefix}-${String(i).padStart(3, "0")},Student${i},Dela Cruz`);
         }
         csvLines.push(`${existingDisabled.studentIdNumber},Former,Student`);
+        csvLines.push(`${existingNeedsReview.studentIdNumber},Review,Student`);
 
         const file = new File([csvLines.join("\n")], "ac01.csv", { type: "text/csv" });
         const formData = new FormData();
@@ -393,13 +460,33 @@ describe.skipIf(!directUrl)("M2A admin Terms, Masterlist, and Directory routes (
         expect(prevRes.status).toBe(200);
         const prevBody = await prevRes.json();
         expect(prevBody.data.preview.toCreate).toHaveLength(100);
-        expect(
-            prevBody.data.preview.warnings.some(
-                (w: { studentIdNumber: string; code: string }) =>
-                    w.studentIdNumber === existingDisabled.studentIdNumber &&
-                    w.code === "EXISTING_NON_ACTIVE",
+
+        const warnings = prevBody.data.preview.warnings as Array<{
+            studentIdNumber: string;
+            code: string;
+        }>;
+        const toCreateIds = new Set(
+            (prevBody.data.preview.toCreate as Array<{ studentIdNumber: string }>).map(
+                (r) => r.studentIdNumber,
             ),
-        ).toBe(true);
+        );
+        const existingActiveIds = new Set(
+            (prevBody.data.preview.existingActive as Array<{ studentIdNumber: string }>).map(
+                (r) => r.studentIdNumber,
+            ),
+        );
+
+        for (const nonActiveUser of [existingDisabled, existingNeedsReview]) {
+            expect(
+                warnings.some(
+                    (w) =>
+                        w.studentIdNumber === nonActiveUser.studentIdNumber &&
+                        w.code === "EXISTING_NON_ACTIVE",
+                ),
+            ).toBe(true);
+            expect(toCreateIds.has(nonActiveUser.studentIdNumber)).toBe(false);
+            expect(existingActiveIds.has(nonActiveUser.studentIdNumber)).toBe(false);
+        }
 
         const commitRes = await commitPost(
             makeRequest("/api/admin/masterlist/commit", "POST", {
@@ -447,9 +534,11 @@ describe.skipIf(!directUrl)("M2A admin Terms, Masterlist, and Directory routes (
             { params: Promise.resolve({ id: commitBody.data.importRecord.id }) },
         );
         expect(reportRes.status).toBe(200);
+        expect(reportRes.headers.get("content-type")).toBe("text/csv; charset=utf-8");
         expect(reportRes.headers.get("cache-control")).toBe("no-store");
         expect(reportRes.headers.get("x-content-type-options")).toBe("nosniff");
         expect(reportRes.headers.get("content-disposition")).toContain("attachment;");
+        expect(await reportRes.text()).toContain(existingDisabled.studentIdNumber);
 
         // Track remaining created users for session cleanup
         const createdBatch = await conn.db
@@ -505,9 +594,36 @@ describe.skipIf(!directUrl)("M2A admin Terms, Masterlist, and Directory routes (
             makeRequest(`/api/admin/directory/export?q=${officer.studentIdNumber}`, "GET"),
         );
         expect(expRes.status).toBe(200);
+        expect(expRes.headers.get("content-type")).toBe("text/csv; charset=utf-8");
         expect(expRes.headers.get("cache-control")).toBe("no-store");
         expect(expRes.headers.get("x-content-type-options")).toBe("nosniff");
         expect(expRes.headers.get("content-disposition")).toContain("attachment;");
+
+        // Formula neutralization in directory CSV export
+        const formulaId = `M2A-${randomUUID().slice(0, 8).toUpperCase()}`;
+        const formulaHash = await hashPassword(normalizeDefaultPassword("Formula", formulaId));
+        const [formulaUser] = await conn.db
+            .insert(users)
+            .values({
+                studentIdNumber: formulaId,
+                firstName: "Evil",
+                lastName: "Formula",
+                fullName: '=HYPERLINK("http://evil")',
+                passwordHash: formulaHash,
+                mustChangePassword: true,
+                systemRole: "MEMBER",
+                accountStatus: "ACTIVE",
+            })
+            .returning();
+        createdUserIds.push(formulaUser.id);
+
+        const formulaExpRes = await directoryExportGet(
+            makeRequest(`/api/admin/directory/export?q=${formulaUser.studentIdNumber}`, "GET"),
+        );
+        expect(formulaExpRes.status).toBe(200);
+        const formulaExpText = await formulaExpRes.text();
+        expect(formulaExpText).toContain("'=HYPERLINK");
+        expect(formulaExpText).not.toContain("passwordHash");
 
         // Last SUPER_ADMIN guard: disable all other active SUPER_ADMINs temporarily inside check?
         // Only assert if exactly 1 active SUPER_ADMIN exists; otherwise create & verify count check is deterministic:
