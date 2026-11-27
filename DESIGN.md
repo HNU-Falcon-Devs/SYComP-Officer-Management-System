@@ -27,6 +27,7 @@ colors:
   warning-dark: "#F59E0B"
   destructive-light: "#B91C1C"
   destructive-dark: "#EF4444"
+  destructive-fill-dark: "#DC2626"
   info-light: "#1D4ED8"
   info-dark: "#60A5FA"
 typography:
@@ -109,6 +110,13 @@ components:
     rounded: "{rounded.md}"
     padding: "10px 16px"
     height: "40px"
+  button-destructive-dark:
+    backgroundColor: "{colors.destructive-fill-dark}"
+    textColor: "{colors.primary-foreground}"
+    typography: "{typography.body}"
+    rounded: "{rounded.md}"
+    padding: "10px 16px"
+    height: "40px"
   card:
     backgroundColor: "{colors.surface-light}"
     textColor: "{colors.foreground-light}"
@@ -175,7 +183,7 @@ The SYComP OMS color system pairs cool alabaster and graphite neutrals with cont
 
 - **Verified Emerald** (`success-light` / `success-dark`): `ACTIVE` accounts, `APPROVED` proposals, `PUBLISHED` events, `PRESENT` attendance, `DONE` tasks, and `READY` QR verification states (`--success`).
 - **Amber Hold** (`warning-light` / `warning-dark`): `PENDING_REVIEW`, `NEEDS_REVISION`, `LATE` attendance, `NEEDS_REVIEW` accounts, `ALREADY_LOGGED` QR warnings, and `SUPER_ADMIN` Break-Glass alerts (`--warning`).
-- **Crimson Block** (`destructive-light` / `destructive-dark`): `REJECTED`, `DISABLED`, `ABSENT`, `CANCELLED`, destructive actions, and `403` / `OFFICER_RESTRICTED` / `ACCOUNT_HOLD` QR lockouts (`--destructive`).
+- **Crimson Block** (`destructive-light` / `destructive-dark`) & **Crimson Action** (`destructive-fill-dark`): `REJECTED`, `DISABLED`, `ABSENT`, `CANCELLED`, destructive actions, and `403` / `OFFICER_RESTRICTED` / `ACCOUNT_HOLD` QR lockouts (`--destructive`). In Dark mode, `destructive-dark` (`#EF4444`, 4.58:1 on `#1B1A22`) is reserved for status text, icons, borders, and tinted pills, while solid dark-mode destructive buttons use `destructive-fill-dark` (`#DC2626`, 4.83:1 against `#FFFFFF`).
 - **Cobalt Progress** (`info-light` / `info-dark`): `IN_PROGRESS`, `FOR_REVIEW`, `ONGOING`, `EXCUSED`, and `SUBMITTED` states (`--info`).
 
 ### Neutral
@@ -260,7 +268,7 @@ Components embody refined, restrained utility—crisp borders, clear state feedb
 - **Shape:** Medium rounded corners (`8px` radius).
 - **Primary:** `Amethyst Ribbon` fill (`#6D28D9` light / `#7C3AED` dark), `#FFFFFF` text, `10px 16px` padding (`40px` desktop height, `>= 44px` mobile touch height).
 - **Hover / Focus:** Smooth `150ms` background darken/lighten shift with a 2px `Lavender Signal` `focus-visible` ring offset `2px`.
-- **Secondary / Ghost / Destructive:** Secondary uses `Cool Lilac Mist` / `Elevated Dusk` with 1px `--border`; Ghost stays transparent until subtle hover tint; Destructive uses `Crimson Block` fill with `#FFFFFF` text strictly for confirmed irreversible-state actions (e.g., `DISABLED` account transition or `REJECTED` proposal).
+- **Secondary / Ghost / Destructive:** Secondary uses `Cool Lilac Mist` / `Elevated Dusk` with 1px `--border`; Ghost stays transparent until subtle hover tint; Destructive uses `Crimson Block` (`#B91C1C`, 6.47:1) in Light mode and `Crimson Action` (`destructive-fill-dark`: `#DC2626`, 4.83:1) in Dark mode paired with `#FFFFFF` text strictly for confirmed irreversible-state actions (e.g., `DISABLED` account transition or `REJECTED` proposal), reserving `#EF4444` for dark status accents, borders, and tinted pills.
 
 ### Chips
 

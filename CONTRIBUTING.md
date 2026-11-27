@@ -15,7 +15,7 @@ Before starting a task or reviewing a pull request, check the authoritative sour
 | `PLAN.md` | Milestone roadmap (M0–M5), Track A / Track B split, and delivery sequence |
 | `AGENTS.md` | Agent instructions, locked paths, and architectural guardrails |
 | `PRODUCT.md` | Product purpose, user roles, operating context, and v1 exclusions |
-| `DESIGN.md` & `design.json` | Normative UI design system, Light/Dark tokens, Dual-Shell rules, and component specs |
+| `DESIGN.md` & `.impeccable/design.json` | Normative UI design system, Light/Dark tokens, Dual-Shell rules, and component specs |
 | `docs/00`–`docs/06` | Full charter, requirements, workflows, data dictionary, RBAC/security, UI/UX, and technical architecture |
 | `.github/CODEOWNERS` | Automated reviewer routing across Core, Track A, and Track B paths |
 
@@ -26,6 +26,7 @@ Before starting a task or reviewing a pull request, check the authoritative sour
 ### Prerequisites
 
 - Node.js (LTS matching the version in `.github/` workflows)
+- `pnpm` (`12.18.0`, pinned via `packageManager` in `package.json` and enabled through Corepack)
 - Git configured with your GitHub account
 - Access to the team's development Supabase PostgreSQL database and Google Drive API credentials
 
@@ -39,9 +40,9 @@ Before starting a task or reviewing a pull request, check the authoritative sour
    git pull origin main
    ```
 
-2. Install dependencies using the repository's configured package manager (examples below use `npm`):
+2. Install dependencies using `pnpm` (`pnpm@12.18.0` is pinned in `package.json`; do not run `npm install` so you avoid alternative dependency resolution and stray `package-lock.json` files):
    ```bash
-   npm install
+   pnpm install --frozen-lockfile
    ```
 
 3. Configure local environment variables:
@@ -52,15 +53,15 @@ Before starting a task or reviewing a pull request, check the authoritative sour
 
 4. Start the development server:
    ```bash
-   npm run dev
+   pnpm dev
    ```
 
 5. Run the full verification suite locally before pushing:
    ```bash
-   npm run lint
-   npm run typecheck
-   npm run test
-   npm run build
+   pnpm lint
+   pnpm typecheck
+   pnpm test
+   pnpm build
    ```
 
 Formatting uses ESLint and Prettier with a **4-space tab width**.
@@ -75,15 +76,15 @@ Formatting uses ESLint and Prettier with a **4-space tab width**.
 
 | Prefix | Ownership Scope | Examples |
 |---|---|---|
-| `chore/core-*` | **Locked Shared Core** — scaffolding, CI/workflows, DB schema & Drizzle config, core auth/RBAC helpers, `src/app/globals.css`, `src/components/ui/`, `PRODUCT.md`, `DESIGN.md`, `design.json` | `chore/core-m0-harness`, `chore/core-theme-tokens` |
-| `feat/a-*` | **Track A** feature work (per `PLAN.md` & `CODEOWNERS`) | `feat/a-auth-onboarding`, `feat/a-event-hub` |
-| `feat/b-*` | **Track B** feature work (per `PLAN.md` & `CODEOWNERS`) | `feat/b-qr-scanner`, `feat/b-masterlist-import` |
+| `chore/core-*` | **Locked Shared Core** — scaffolding, CI/workflows, DB schema & Drizzle config, core auth/RBAC helpers, `src/app/globals.css`, `PRODUCT.md`, `DESIGN.md`, `.impeccable/design.json` | `chore/core-m0-harness`, `chore/core-theme-tokens` |
+| `feat/a-*` | **Track A** feature work (per `PLAN.md`, `AGENTS.md`, & `CODEOWNERS`, including Event Hub `attendance-tab.tsx` & `documents-tab.tsx`) | `feat/a-auth-onboarding`, `feat/a-qr-scanner`, `feat/a-masterlist-import` |
+| `feat/b-*` | **Track B** feature work (per `PLAN.md`, `AGENTS.md`, & `CODEOWNERS`, including `src/components/ui/` & Event Hub excluding `attendance-tab.tsx` & `documents-tab.tsx`) | `feat/b-dual-shells`, `feat/b-event-hub`, `feat/b-member-portal` |
 | `fix/*` | Targeted bug fixes scoped to the owning track or core | `fix/scanner-offline-guard` |
 
 ### Avoiding Merge Conflicts
 
-- Keep `feat/a-*` and `feat/b-*` strictly within their assigned directories in `PLAN.md` and `.github/CODEOWNERS`.
-- If a feature branch needs a new shared Shadcn primitive, global token tweak, or database schema migration, stop and land that shared change via a small `chore/core-*` PR first, then rebase your feature branch onto `main`.
+- Keep `feat/a-*` and `feat/b-*` strictly within their assigned directories in `PLAN.md`, `AGENTS.md`, and `.github/CODEOWNERS`.
+- If a feature branch needs a Locked Core change (global token tweak, core auth/security helper, or database schema migration), stop and land that shared change via a small `chore/core-*` PR first, then rebase your feature branch onto `main`. Shared Shadcn primitives under `src/components/ui/` are owned by and coordinated through Track B (`@Syris-EkzD`).
 - Rebase frequently against `origin/main` to keep diffs small and clean:
   ```bash
   git fetch origin
@@ -106,7 +107,7 @@ Our repository includes shared agent skills in `.agents/skills/` for both **Anti
 
 ### Impeccable (UI Design & Quality)
 
-`PRODUCT.md`, `DESIGN.md`, and `design.json` are already initialized at the root. Impeccable reads them automatically on every UI task.
+`PRODUCT.md` and `DESIGN.md` (at the repository root) and `.impeccable/design.json` (the machine-readable sidecar) are already initialized. Impeccable reads them automatically on every UI task.
 
 **Recommended Feature Loop:**
 1. **Plan complex views first:** Run `/impeccable shape <feature>` before writing JSX for multi-state flows (e.g., `/scanner`, `/events/[slug]` Event Hub, bulk masterlist import).
@@ -116,17 +117,17 @@ Our repository includes shared agent skills in `.agents/skills/` for both **Anti
    - `/impeccable harden <path>` — verify loading skeletons, empty states, offline lockouts, and long/edge-case data.
    - `/impeccable critique <path>` — run when a screen's UX or hierarchy feels off.
 4. **Targeted fixes & finish:** Use `/impeccable adapt <path>` (responsive breakpoints) or `/impeccable clarify <path>` (labels and error copy), then run `/impeccable polish <path>`.
-5. **Local static check:** Run `npx impeccable detect <path>` before opening your PR to catch visual regressions.
+5. **Local static check:** Run the installed version-aware launcher before opening your PR to catch visual regressions: `.agents/skills/impeccable/scripts/impeccable detect <path>` (POSIX / Git Bash) or `.agents/skills/impeccable/scripts/impeccable.cmd detect <path>` (Windows PowerShell/cmd). Do not run unpinned `npx impeccable` (the retired npm CLI is incompatible with the bundled 4.11.1 skill).
 
 **Impeccable Team Rules:**
-- **Do not run `init`, `document`, or `extract` on `feat/a-*` or `feat/b-*` branches.** Updates to `PRODUCT.md`, `DESIGN.md`, `design.json`, or shared `src/components/ui/` primitives must go through `chore/core-*`.
+- **Do not run `init`, `document`, or `extract` on `feat/a-*` or `feat/b-*` branches.** Updates to `PRODUCT.md`, `DESIGN.md`, and `.impeccable/design.json` must go through `chore/core-*` (shared primitives in `src/components/ui/` follow Track B ownership).
 - **Do not use `colorize`, `delight`, or `overdrive`.** They conflict with SYComP OMS's flat-by-default, 10% amethyst restraint, and zero-emoji rules.
 - **Prompt wording:** Ask to **"refine"** when preserving an existing layout and fixing details; ask to **"redesign"** only when intentionally replacing a screen's structure.
 
 ### Ponytail (Lean & Secure Implementation)
 
 Ponytail has no initialization step and generates no project files. Use it to prevent over-engineering, dead abstractions, and missing validation:
-- Keep Ponytail on `/ponytail lite` during normal feature development (or `/ponytail off` briefly when laying down initial route skeletons).
+- Keep Ponytail in its mandatory `full` mode during normal feature development, matching `AGENTS.md`.
 - Always run `/ponytail-review` against your branch diff right before opening a Pull Request to strip unnecessary boilerplate and catch security or validation gaps.
 
 ---
@@ -163,8 +164,8 @@ When building or reviewing frontend code, verify alignment with `DESIGN.md`:
 Before requesting a review from your teammate:
 
 - [ ] Branch is up to date with `origin/main` and touches only files within your track/core scope.
-- [ ] `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` all pass locally with zero errors.
-- [ ] UI changes were checked with `/impeccable audit`, `/impeccable harden`, and `npx impeccable detect <path>`.
+- [ ] `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build` all pass locally with zero errors.
+- [ ] UI changes were checked with `/impeccable audit`, `/impeccable harden`, and `.agents/skills/impeccable/scripts/impeccable detect <path>` (or `.agents/skills/impeccable/scripts/impeccable.cmd detect <path>` on Windows).
 - [ ] Full branch diff was reviewed with `/ponytail-review`.
 - [ ] All security invariants (`authorize()`, zero hard deletes, no secret leaks, break-glass rules) are verified.
 - [ ] PR description briefly states **what changed**, **how to verify it** (including Light/Dark and mobile screenshots for UI work), and links the relevant milestone in `PLAN.md`.

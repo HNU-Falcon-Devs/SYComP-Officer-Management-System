@@ -1,6 +1,6 @@
 {
     "schemaVersion": 2,
-    "generatedAt": "2026-11-27T02:58:00+08:00",
+    "generatedAt": "2026-11-27T20:55:00+08:00",
     "title": "Design System: SYComP OMS",
     "extensions": {
         "colorMeta": {
@@ -364,6 +364,21 @@
                     "#FEE2E2"
                 ]
             },
+            "destructive-fill-dark": {
+                "role": "secondary",
+                "displayName": "Crimson Action (Dark Fill)",
+                "canonical": "#DC2626",
+                "tonalRamp": [
+                    "#450A0A",
+                    "#7F1D1D",
+                    "#991B1B",
+                    "#B91C1C",
+                    "#DC2626",
+                    "#EF4444",
+                    "#FCA5A5",
+                    "#FEE2E2"
+                ]
+            },
             "info-light": {
                 "role": "secondary",
                 "displayName": "Cobalt Progress (Light)",
@@ -491,9 +506,17 @@
             "name": "Destructive Button",
             "kind": "button",
             "refersTo": "button-destructive",
-            "description": "High-consequence action button reserved for account disablement, proposal rejection, or break-glass overrides.",
+            "description": "High-consequence Light-mode action button using Crimson Block (#B91C1C) fill with #FFFFFF text (6.47:1 AA contrast), reserved for account disablement, proposal rejection, or break-glass overrides.",
             "html": "<button class=\"ds-btn-destructive\" type=\"button\">Reject Proposal</button>",
             "css": ".ds-btn-destructive { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 10px 16px; border: 1px solid #B91C1C; border-radius: 8px; background: #B91C1C; color: #FFFFFF; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 14px; font-weight: 500; line-height: 1; cursor: pointer; transition: background-color 150ms cubic-bezier(0.2, 0, 0, 1); } .ds-btn-destructive:hover { background: #991B1B; } .ds-btn-destructive:focus-visible { outline: 2px solid #8B5CF6; outline-offset: 2px; } .ds-btn-destructive:active { background: #7F1D1D; }"
+        },
+        {
+            "name": "Destructive Button (Dark)",
+            "kind": "button",
+            "refersTo": "button-destructive-dark",
+            "description": "High-consequence Dark-mode action button using Crimson Action (#DC2626) fill with #FFFFFF text (4.83:1 AA contrast), reserving #EF4444 for dark status accents and borders.",
+            "html": "<button class=\"ds-btn-destructive-dark\" type=\"button\">Reject Proposal</button>",
+            "css": ".ds-btn-destructive-dark { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 10px 16px; border: 1px solid #DC2626; border-radius: 8px; background: #DC2626; color: #FFFFFF; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 14px; font-weight: 500; line-height: 1; cursor: pointer; transition: background-color 150ms cubic-bezier(0.2, 0, 0, 1); } .ds-btn-destructive-dark:hover { background: #B91C1C; border-color: #B91C1C; } .ds-btn-destructive-dark:focus-visible { outline: 2px solid #A78BFA; outline-offset: 2px; } .ds-btn-destructive-dark:active { background: #991B1B; border-color: #991B1B; }"
         },
         {
             "name": "Text Input",
