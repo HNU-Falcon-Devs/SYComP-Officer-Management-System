@@ -427,9 +427,10 @@ describe.skipIf(!directUrl)("M3A dynamic attendance & 2-step QR scanner routes (
         const otherOfficer = await createTestUser("OFFICER");
         const exec = await createTestUser("EXECUTIVE");
         const superAdmin = await createTestUser("SUPER_ADMIN");
+        const secretEmail = `secret.student.${randomUUID().slice(0, 8).toLowerCase()}@hnu.edu.ph`;
         const memberReady = await createTestUser("MEMBER", {
             fullName: '=HYPERLINK("http://evil","Formula Student")',
-            universityEmail: "secret.student@hnu.edu.ph",
+            universityEmail: secretEmail,
         });
         const memberHold = await createTestUser("MEMBER", { status: "NEEDS_REVIEW" });
         const appointedMemberRole = await createTestUser("MEMBER");
@@ -788,7 +789,7 @@ describe.skipIf(!directUrl)("M3A dynamic attendance & 2-step QR scanner routes (
 
         const csvText = await exportRes.text();
         expect(csvText).toContain("'=HYPERLINK");
-        expect(csvText).not.toContain("secret.student@hnu.edu.ph");
+        expect(csvText).not.toContain(secretEmail);
         expect(csvText).not.toContain("passwordHash");
     });
 });
