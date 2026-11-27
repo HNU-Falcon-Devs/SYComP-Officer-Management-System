@@ -55,5 +55,9 @@ export const ROUTES = {
         documents: "/api/documents",
         announcements: "/api/announcements",
         admin: "/api/admin",
+        adminTerms: "/api/admin/terms",
+        adminMasterlist: "/api/admin/masterlist",
+        adminDirectory: "/api/admin/directory",
+        adminUsers: "/api/admin/users",
     },
 } as const;
