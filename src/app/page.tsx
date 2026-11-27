@@ -1,8 +1,30 @@
+import { Suspense } from "react";
+import { redirect } from "next/navigation";
+import { ROUTES } from "@/config/routes";
+import { getDefaultHomeForRole, getServerSession } from "@/lib/auth/server";
+import { Skeleton } from "@/components/ui/skeleton";
+
+async function RootRouter(): Promise<never> {
+    const session = await getServerSession();
+    if (!session) {
+        redirect(ROUTES.auth.login);
+    }
+    if (session.user.accountStatus !== "ACTIVE") {
+        redirect(ROUTES.auth.accountHold);
+    }
+    redirect(getDefaultHomeForRole(session.user.systemRole));
+}
+
 export default function HomePage() {
     return (
-        <main className="flex min-h-screen flex-col items-center justify-center p-8">
-            <h1 className="text-2xl font-semibold tracking-tight">SYComP OMS</h1>
-            <p className="mt-2 text-sm text-muted-foreground">M0 foundation harness initialized.</p>
-        </main>
+        <Suspense
+            fallback={
+                <main className="flex min-h-screen items-center justify-center p-6">
+                    <Skeleton className="h-10 w-48" />
+                </main>
+            }
+        >
+            <RootRouter />
+        </Suspense>
     );
 }
