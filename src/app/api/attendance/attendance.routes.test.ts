@@ -456,10 +456,16 @@ describe.skipIf(!directUrl)("M3A dynamic attendance & 2-step QR scanner routes (
             }),
         );
         const cpAll = (await cpAllRes.json()).data.checkpoint;
-        await checkpointPatch(
-            makeRequest(`/api/attendance/checkpoints/${cpAll.id}`, "PATCH", { status: "OPEN" }),
-            { params: Promise.resolve({ id: cpAll.id }) },
-        );
+        expect(
+            (
+                await checkpointPatch(
+                    makeRequest(`/api/attendance/checkpoints/${cpAll.id}`, "PATCH", {
+                        status: "OPEN",
+                    }),
+                    { params: Promise.resolve({ id: cpAll.id }) },
+                )
+            ).status,
+        ).toBe(200);
 
         const cpGenRes = await checkpointsPost(
             makeRequest("/api/attendance/checkpoints", "POST", {
@@ -469,10 +475,16 @@ describe.skipIf(!directUrl)("M3A dynamic attendance & 2-step QR scanner routes (
             }),
         );
         const cpGen = (await cpGenRes.json()).data.checkpoint;
-        await checkpointPatch(
-            makeRequest(`/api/attendance/checkpoints/${cpGen.id}`, "PATCH", { status: "OPEN" }),
-            { params: Promise.resolve({ id: cpGen.id }) },
-        );
+        expect(
+            (
+                await checkpointPatch(
+                    makeRequest(`/api/attendance/checkpoints/${cpGen.id}`, "PATCH", {
+                        status: "OPEN",
+                    }),
+                    { params: Promise.resolve({ id: cpGen.id }) },
+                )
+            ).status,
+        ).toBe(200);
 
         // OFFICER lookup verification states
         await signInAs(officer);
@@ -659,10 +671,11 @@ describe.skipIf(!directUrl)("M3A dynamic attendance & 2-step QR scanner routes (
         expect(manualRes.status).toBe(201);
 
         // Close cpAll -> lookup returns 409 CHECKPOINT_NOT_OPEN (Adjustment 2 parity)
-        await checkpointPatch(
+        const closeAllRes = await checkpointPatch(
             makeRequest(`/api/attendance/checkpoints/${cpAll.id}`, "PATCH", { status: "CLOSED" }),
             { params: Promise.resolve({ id: cpAll.id }) },
         );
+        expect(closeAllRes.status).toBe(200);
         const closedLookupRes = await lookupGet(
             makeRequest(
                 `/api/attendance/lookup?checkpointId=${cpAll.id}&studentId=${memberReady.studentIdNumber}`,
@@ -727,8 +740,18 @@ describe.skipIf(!directUrl)("M3A dynamic attendance & 2-step QR scanner routes (
         );
         const compCp = (await compCpRes.json()).data.checkpoint;
 
-        // EXECUTIVE blocked from manual override on COMPLETED event (409)
+        // EXECUTIVE blocked from lookup & manual override on COMPLETED event (409 RESOURCE_LOCKED)
         await signInAs(exec);
+        const lockedLookupRes = await lookupGet(
+            makeRequest(
+                `/api/attendance/lookup?checkpointId=${compCp.id}&studentId=${memberReady.studentIdNumber}`,
+                "GET",
+            ),
+        );
+        expect(lockedLookupRes.status).toBe(409);
+        expect(await lockedLookupRes.json()).toMatchObject({
+            error: { code: "RESOURCE_LOCKED" },
+        });
         expect(
             (
                 await overridePost(

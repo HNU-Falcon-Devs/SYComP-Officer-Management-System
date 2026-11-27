@@ -509,6 +509,23 @@ export function validateScanWindowAndParentLock(
           code: string;
           message: string;
       } {
+    const isTermLocked = ctx.term.status === "CLOSED";
+    const isEventLocked =
+        ctx.event?.status === "COMPLETED" || ctx.event?.status === "REJECTED";
+    const isMeetingLocked =
+        ctx.meeting?.status === "COMPLETED" || ctx.meeting?.status === "CANCELLED";
+    const isLocked = isTermLocked || isEventLocked || isMeetingLocked;
+
+    if (isLocked && actorRole !== "SUPER_ADMIN") {
+        return {
+            ok: false,
+            status: 409,
+            code: "RESOURCE_LOCKED",
+            message:
+                "Attendance scanning is locked for closed terms or completed/cancelled sessions.",
+        };
+    }
+
     if (ctx.checkpoint.status !== "OPEN") {
         return {
             ok: false,
@@ -518,45 +535,28 @@ export function validateScanWindowAndParentLock(
         };
     }
 
-    const isTermLocked = ctx.term.status === "CLOSED";
-    const isEventLocked =
-        ctx.event?.status === "COMPLETED" || ctx.event?.status === "REJECTED";
-    const isMeetingLocked =
-        ctx.meeting?.status === "COMPLETED" || ctx.meeting?.status === "CANCELLED";
-
-    if (isTermLocked || isEventLocked || isMeetingLocked) {
-        if (actorRole !== "SUPER_ADMIN") {
+    if (!isLocked) {
+        if (ctx.event && ctx.event.status !== "PUBLISHED") {
             return {
                 ok: false,
                 status: 409,
-                code: "RESOURCE_LOCKED",
-                message:
-                    "Attendance scanning is locked for closed terms or completed/cancelled sessions.",
+                code: "EVENT_NOT_PUBLISHED",
+                message: "Attendance scanning is only allowed for PUBLISHED events.",
             };
         }
-        return { ok: true };
-    }
 
-    if (ctx.event && ctx.event.status !== "PUBLISHED") {
-        return {
-            ok: false,
-            status: 409,
-            code: "EVENT_NOT_PUBLISHED",
-            message: "Attendance scanning is only allowed for PUBLISHED events.",
-        };
-    }
-
-    if (
-        ctx.meeting &&
-        ctx.meeting.status !== "SCHEDULED" &&
-        ctx.meeting.status !== "ONGOING"
-    ) {
-        return {
-            ok: false,
-            status: 409,
-            code: "MEETING_NOT_ACTIVE",
-            message: "Attendance scanning is only allowed for SCHEDULED or ONGOING meetings.",
-        };
+        if (
+            ctx.meeting &&
+            ctx.meeting.status !== "SCHEDULED" &&
+            ctx.meeting.status !== "ONGOING"
+        ) {
+            return {
+                ok: false,
+                status: 409,
+                code: "MEETING_NOT_ACTIVE",
+                message: "Attendance scanning is only allowed for SCHEDULED or ONGOING meetings.",
+            };
+        }
     }
 
     return { ok: true };
