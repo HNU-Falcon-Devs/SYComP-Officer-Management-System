@@ -86,6 +86,7 @@ const NAV_GROUPS: readonly NavGroup[] = [
                 href: ROUTES.workspace.tasks,
                 icon: CheckSquare,
                 roles: ALL_OPERATIONAL,
+                implementedInM2: true,
             },
             {
                 label: "Officer Meetings",
@@ -433,9 +434,12 @@ export function ShellB({ actor, activeTerm, children }: ShellBProps) {
                                     : pathname === ROUTES.workspace.events ||
                                         pathname.startsWith(`${ROUTES.workspace.events}/`)
                                       ? "Events & Proposals"
-                                      : pathname === ROUTES.workspace.documents ||
-                                          pathname.startsWith(`${ROUTES.workspace.documents}/`)
-                                        ? "Documents"
+                                      : pathname === ROUTES.workspace.tasks ||
+                                          pathname.startsWith(`${ROUTES.workspace.tasks}/`)
+                                        ? "My Tasks"
+                                        : pathname === ROUTES.workspace.documents ||
+                                            pathname.startsWith(`${ROUTES.workspace.documents}/`)
+                                          ? "Documents"
                                         : pathname === ROUTES.workspace.meetings ||
                                             pathname.startsWith(`${ROUTES.workspace.meetings}/`)
                                           ? "Officer Meetings"

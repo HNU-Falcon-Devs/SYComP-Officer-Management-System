@@ -43,6 +43,7 @@ import { EventAttendanceTab } from "@/components/event-hub/attendance-tab";
 import { CommitteesTab } from "@/components/event-hub/committees-tab";
 import { EventDocumentsTab } from "@/components/event-hub/documents-tab";
 import { EventStatusBadge } from "@/components/event-hub/event-status-badge";
+import { EventTasksTab } from "@/components/event-hub/tasks-tab";
 import { Badge } from "@/components/ui/badge";
 import { BreakGlassModal } from "@/components/ui/break-glass-modal";
 import { Button } from "@/components/ui/button";
@@ -362,11 +363,6 @@ export function EventHubWorkspace({
         { id: "attendance", label: "Attendance", icon: ClipboardCheck, count: event.checkpointCount },
         { id: "documents", label: "Documents", icon: FolderOpen, count: event.documentCount },
     ];
-
-    const committeesUnlocked =
-        event.status === "APPROVED" ||
-        event.status === "PUBLISHED" ||
-        event.status === "COMPLETED";
 
     return (
         <div className="flex flex-col gap-6">
@@ -1039,23 +1035,35 @@ export function EventHubWorkspace({
             ) : null}
 
             {activeTab === "tasks" ? (
-                <Card>
-                    <CardContent className="flex flex-col items-center justify-center gap-2 py-12 text-center">
-                        <CheckSquare
-                            className="size-10 text-muted-foreground"
-                            strokeWidth={1.5}
-                            aria-hidden="true"
-                        />
-                        <p className="text-sm font-medium text-foreground">
-                            Event Tasks &amp; Deliverables Board (Upcoming Slice)
-                        </p>
-                        <p className="max-w-md text-xs text-muted-foreground">
-                            {committeesUnlocked
-                                ? `${event.completedTaskCount} of ${event.taskCount} tasks completed across ${committees.length} committees. Interactive task creation, assignment, and Kanban board will mount here in the Track B Tasks slice.`
-                                : "Tasks will unlock alongside Committees once this event proposal is APPROVED."}
-                        </p>
-                    </CardContent>
-                </Card>
+                <EventTasksTab
+                    eventId={event.id}
+                    eventStatus={event.status}
+                    termStatus={event.academicTerm.status}
+                    committees={committees}
+                    eligibleOfficers={eligibleOfficers}
+                    actorId={actorId}
+                    userRole={userRole}
+                    onTaskStatsChange={(summary) => {
+                        setEvent((prev) => ({
+                            ...prev,
+                            taskCount: summary.taskCount,
+                            completedTaskCount: summary.completedTaskCount,
+                        }));
+                        setCommittees((prev) =>
+                            prev.map((committee) => {
+                                const stats = summary.byCommittee[committee.id] ?? {
+                                    total: 0,
+                                    done: 0,
+                                };
+                                return {
+                                    ...committee,
+                                    taskTotal: stats.total,
+                                    taskDone: stats.done,
+                                };
+                            }),
+                        );
+                    }}
+                />
             ) : null}
 
             {activeTab === "attendance" ? (
