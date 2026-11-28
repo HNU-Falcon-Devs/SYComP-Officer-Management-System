@@ -636,6 +636,16 @@ describe.skipIf(!directUrl)("M4A Google Drive & Documents routes (local Supabase
                 )
             ).status,
         ).toBe(403);
+        expect(
+            (
+                await uploadFinalizePost(
+                    makeJsonRequest("/api/documents/upload-finalize", "POST", {
+                        driveFileId: "mock-file-unauth",
+                        uploadIntentToken: "bogus.token",
+                    }),
+                )
+            ).status,
+        ).toBe(403);
 
         // Officer moves DRAFT -> FOR_REVIEW -> SUBMITTED, but cannot APPROVE (403)
         cookieJar.value = officer.token;
@@ -673,11 +683,44 @@ describe.skipIf(!directUrl)("M4A Google Drive & Documents routes (local Supabase
         expect(approveRes.status).toBe(200);
         const approvedDto = (
             (await approveRes.json()) as {
-                data: { document: { status: string; approvedBy: { id: string } | null } };
+                data: {
+                    document: {
+                        status: string;
+                        approvedBy: { id: string } | null;
+                        approvedAt: string | null;
+                    };
+                };
             }
         ).data.document;
         expect(approvedDto.status).toBe("APPROVED");
         expect(approvedDto.approvedBy?.id).toBe(executive.user.id);
+        expect(approvedDto.approvedAt).toBeTruthy();
+
+        // Renaming an already-APPROVED document preserves original approvedBy & approvedAt
+        cookieJar.value = superAdmin.token;
+        const renameApprovedRes = await documentByIdPatch(
+            makeJsonRequest(`/api/documents/${docId}`, "PATCH", {
+                title: "Workflow Lifecycle Doc (Final Title)",
+                breakGlass: true,
+                reason: "Standardizing title format after Executive approval.",
+            }),
+            { params: Promise.resolve({ id: docId }) },
+        );
+        expect(renameApprovedRes.status).toBe(200);
+        const renamedApprovedDto = (
+            (await renameApprovedRes.json()) as {
+                data: {
+                    document: {
+                        title: string;
+                        approvedBy: { id: string } | null;
+                        approvedAt: string | null;
+                    };
+                };
+            }
+        ).data.document;
+        expect(renamedApprovedDto.title).toBe("Workflow Lifecycle Doc (Final Title)");
+        expect(renamedApprovedDto.approvedBy?.id).toBe(executive.user.id);
+        expect(renamedApprovedDto.approvedAt).toBe(approvedDto.approvedAt);
 
         // SUPER_ADMIN archiving requires breakGlass + >= 10 char reason
         cookieJar.value = superAdmin.token;

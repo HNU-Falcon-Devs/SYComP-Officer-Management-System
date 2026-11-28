@@ -47,10 +47,14 @@ export interface DriveProvider {
 }
 
 export class DriveServiceError extends Error {
-    readonly status: 400 | 403 | 404 | 413 | 502 | 503;
+    readonly status: 400 | 403 | 404 | 409 | 413 | 502 | 503;
     readonly code: string;
 
-    constructor(status: 400 | 403 | 404 | 413 | 502 | 503, code: string, message: string) {
+    constructor(
+        status: 400 | 403 | 404 | 409 | 413 | 502 | 503,
+        code: string,
+        message: string,
+    ) {
         super(message);
         this.name = "DriveServiceError";
         this.status = status;

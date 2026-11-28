@@ -163,10 +163,9 @@ export async function PATCH(
                 return { kind: "unchanged" as const };
             }
 
-            const nextApprovedBy =
-                nextStatus === "APPROVED" ? actor.id : existing.approvedBy;
-            const nextApprovedAt =
-                nextStatus === "APPROVED" ? now : existing.approvedAt;
+            const transitioningToApproved = statusChanged && nextStatus === "APPROVED";
+            const nextApprovedBy = transitioningToApproved ? actor.id : existing.approvedBy;
+            const nextApprovedAt = transitioningToApproved ? now : existing.approvedAt;
 
             const [updated] = await tx
                 .update(documents)

@@ -336,7 +336,7 @@ export function DirectoryTable({
                     </span>
                     <a
                         href={exportHref}
-                        className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-border bg-card px-3 text-xs font-medium text-foreground hover:bg-muted"
+                        className="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-border bg-card px-3 text-xs font-medium text-foreground hover:bg-muted sm:min-h-9"
                     >
                         <Download className="size-3.5" strokeWidth={1.75} aria-hidden="true" />
                         <span>Export CSV</span>

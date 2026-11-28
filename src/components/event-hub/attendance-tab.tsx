@@ -112,6 +112,15 @@ export function EventAttendanceTab({
 }: EventAttendanceTabProps) {
     const canManage = userRole === "EXECUTIVE" || userRole === "SUPER_ADMIN";
     const isSuperAdmin = userRole === "SUPER_ADMIN";
+    const isEventLocked = eventStatus === "COMPLETED" || eventStatus === "REJECTED";
+    const isPreApproval =
+        eventStatus === "DRAFT" ||
+        eventStatus === "PENDING_REVIEW" ||
+        eventStatus === "NEEDS_REVISION";
+    const canMutate = canManage && (!isEventLocked || isSuperAdmin);
+    const canCreateCheckpoint = canMutate && !isPreApproval;
+    const canOpenCheckpoint =
+        eventStatus === "PUBLISHED" || (eventStatus === "COMPLETED" && isSuperAdmin);
 
     const [loading, setLoading] = useState(true);
     const [checkpoints, setCheckpoints] = useState<CheckpointDto[]>([]);
@@ -166,35 +175,60 @@ export function EventAttendanceTab({
 
     const loadTabData = useCallback(
         async (targetPage = 1) => {
-            const [cpRes, recRes] = await Promise.all([
-                fetch(`${ROUTES.api.attendance.checkpoints}?eventId=${encodeURIComponent(eventId)}`),
-                fetch(`${ROUTES.api.attendance.records}?${buildRecordParams(targetPage).toString()}`),
-            ]);
+            try {
+                const [cpRes, recRes] = await Promise.all([
+                    fetch(
+                        `${ROUTES.api.attendance.checkpoints}?eventId=${encodeURIComponent(eventId)}`,
+                    ),
+                    fetch(
+                        `${ROUTES.api.attendance.records}?${buildRecordParams(targetPage).toString()}`,
+                    ),
+                ]);
 
-            if (cpRes.ok) {
-                const cpPayload = (await cpRes.json()) as {
-                    data?: { checkpoints: CheckpointDto[] };
-                };
-                if (cpPayload.data) {
-                    const nextCps = cpPayload.data.checkpoints;
-                    setCheckpoints(nextCps);
-                    setOverrideCheckpointId((prev) => prev || nextCps[0]?.id || "");
-                }
-            }
-            if (recRes.ok) {
-                const recPayload = (await recRes.json()) as {
-                    data?: {
-                        items: AttendanceRecordDto[];
-                        pagination: { page: number; total: number };
+                const errors: string[] = [];
+                if (cpRes.ok) {
+                    const cpPayload = (await cpRes.json()) as {
+                        data?: { checkpoints: CheckpointDto[] };
                     };
-                };
-                if (recPayload.data) {
-                    setRecords(recPayload.data.items);
-                    setTotal(recPayload.data.pagination.total);
-                    setPage(recPayload.data.pagination.page);
+                    if (cpPayload.data) {
+                        const nextCps = cpPayload.data.checkpoints;
+                        setCheckpoints(nextCps);
+                        setOverrideCheckpointId((prev) => prev || nextCps[0]?.id || "");
+                    }
+                } else {
+                    const cpErr = (await cpRes.json().catch(() => null)) as {
+                        error?: { message?: string };
+                    } | null;
+                    errors.push(cpErr?.error?.message ?? "Failed to load checkpoints.");
                 }
+
+                if (recRes.ok) {
+                    const recPayload = (await recRes.json()) as {
+                        data?: {
+                            items: AttendanceRecordDto[];
+                            pagination: { page: number; total: number };
+                        };
+                    };
+                    if (recPayload.data) {
+                        setRecords(recPayload.data.items);
+                        setTotal(recPayload.data.pagination.total);
+                        setPage(recPayload.data.pagination.page);
+                    }
+                } else {
+                    const recErr = (await recRes.json().catch(() => null)) as {
+                        error?: { message?: string };
+                    } | null;
+                    errors.push(recErr?.error?.message ?? "Failed to load attendance records.");
+                }
+
+                if (errors.length > 0) {
+                    setErrorMsg(errors.join(" "));
+                }
+            } catch {
+                setErrorMsg("Network error while loading attendance data.");
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         },
         [buildRecordParams, eventId],
     );
@@ -202,43 +236,68 @@ export function EventAttendanceTab({
     useEffect(() => {
         let cancelled = false;
         async function loadInitial() {
-            const [cpRes, recRes] = await Promise.all([
-                fetch(`${ROUTES.api.attendance.checkpoints}?eventId=${encodeURIComponent(eventId)}`),
-                fetch(
-                    `${ROUTES.api.attendance.records}?${new URLSearchParams({
-                        eventId,
-                        page: "1",
-                        limit: String(ATTENDANCE_DEFAULT_LIMIT),
-                    }).toString()}`,
-                ),
-            ]);
-            if (cancelled) return;
+            try {
+                const [cpRes, recRes] = await Promise.all([
+                    fetch(
+                        `${ROUTES.api.attendance.checkpoints}?eventId=${encodeURIComponent(eventId)}`,
+                    ),
+                    fetch(
+                        `${ROUTES.api.attendance.records}?${new URLSearchParams({
+                            eventId,
+                            page: "1",
+                            limit: String(ATTENDANCE_DEFAULT_LIMIT),
+                        }).toString()}`,
+                    ),
+                ]);
+                if (cancelled) return;
 
-            if (cpRes.ok) {
-                const cpPayload = (await cpRes.json()) as {
-                    data?: { checkpoints: CheckpointDto[] };
-                };
-                if (!cancelled && cpPayload.data) {
-                    const nextCps = cpPayload.data.checkpoints;
-                    setCheckpoints(nextCps);
-                    setOverrideCheckpointId((prev) => prev || nextCps[0]?.id || "");
-                }
-            }
-            if (recRes.ok) {
-                const recPayload = (await recRes.json()) as {
-                    data?: {
-                        items: AttendanceRecordDto[];
-                        pagination: { page: number; total: number };
+                const errors: string[] = [];
+                if (cpRes.ok) {
+                    const cpPayload = (await cpRes.json()) as {
+                        data?: { checkpoints: CheckpointDto[] };
                     };
-                };
-                if (!cancelled && recPayload.data) {
-                    setRecords(recPayload.data.items);
-                    setTotal(recPayload.data.pagination.total);
-                    setPage(recPayload.data.pagination.page);
+                    if (!cancelled && cpPayload.data) {
+                        const nextCps = cpPayload.data.checkpoints;
+                        setCheckpoints(nextCps);
+                        setOverrideCheckpointId((prev) => prev || nextCps[0]?.id || "");
+                    }
+                } else {
+                    const cpErr = (await cpRes.json().catch(() => null)) as {
+                        error?: { message?: string };
+                    } | null;
+                    errors.push(cpErr?.error?.message ?? "Failed to load checkpoints.");
                 }
-            }
-            if (!cancelled) {
-                setLoading(false);
+
+                if (recRes.ok) {
+                    const recPayload = (await recRes.json()) as {
+                        data?: {
+                            items: AttendanceRecordDto[];
+                            pagination: { page: number; total: number };
+                        };
+                    };
+                    if (!cancelled && recPayload.data) {
+                        setRecords(recPayload.data.items);
+                        setTotal(recPayload.data.pagination.total);
+                        setPage(recPayload.data.pagination.page);
+                    }
+                } else {
+                    const recErr = (await recRes.json().catch(() => null)) as {
+                        error?: { message?: string };
+                    } | null;
+                    errors.push(recErr?.error?.message ?? "Failed to load attendance records.");
+                }
+
+                if (!cancelled && errors.length > 0) {
+                    setErrorMsg(errors.join(" "));
+                }
+            } catch {
+                if (!cancelled) {
+                    setErrorMsg("Network error while loading attendance data.");
+                }
+            } finally {
+                if (!cancelled) {
+                    setLoading(false);
+                }
             }
         }
         void loadInitial();
@@ -289,6 +348,8 @@ export function EventAttendanceTab({
             setCpLabel("");
             setShowAddCp(false);
             await loadTabData(1);
+        } catch {
+            setErrorMsg("Network error while creating checkpoint. Please try again.");
         } finally {
             setSavingCp(false);
         }
@@ -324,6 +385,8 @@ export function EventAttendanceTab({
             }
             toast.success(`Checkpoint "${cp.label}" is now ${nextStatus}.`);
             await loadTabData(page);
+        } catch {
+            setErrorMsg("Network error while updating checkpoint. Please try again.");
         } finally {
             setTogglingCpId(null);
         }
@@ -367,6 +430,8 @@ export function EventAttendanceTab({
             setOverrideStudentId("");
             setOverrideReason("");
             await loadTabData(page);
+        } catch {
+            setErrorMsg("Network error while saving attendance override. Please try again.");
         } finally {
             setSavingOverride(false);
         }
@@ -407,12 +472,18 @@ export function EventAttendanceTab({
                             <span className="font-mono text-xs text-foreground">{eventStatus}</span>
                         </CardDescription>
                     </div>
-                    {canManage ? (
+                    {canMutate ? (
                         <div className="flex flex-wrap gap-2">
                             <Button
                                 type="button"
                                 variant="secondary"
                                 size="sm"
+                                disabled={!canCreateCheckpoint}
+                                title={
+                                    isPreApproval
+                                        ? "Checkpoints require an APPROVED or PUBLISHED event."
+                                        : undefined
+                                }
                                 onClick={() => setShowAddCp((v) => !v)}
                             >
                                 <Plus className="size-3.5" strokeWidth={1.75} aria-hidden="true" />
@@ -438,7 +509,29 @@ export function EventAttendanceTab({
                 </CardHeader>
 
                 <CardContent className="flex flex-col gap-4">
-                    {canManage && isSuperAdmin ? (
+                    {isEventLocked && !isSuperAdmin ? (
+                        <div className="flex items-center gap-2 rounded-md border border-border bg-muted/50 px-3 py-2.5 text-xs text-muted-foreground">
+                            <Lock className="size-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
+                            <span>
+                                Attendance is read-only for {eventStatus.toLowerCase()} events.
+                                Only Super Admin break-glass overrides can modify locked records.
+                            </span>
+                        </div>
+                    ) : canManage && isPreApproval ? (
+                        <div className="flex items-center gap-2 rounded-md border border-border bg-muted/50 px-3 py-2.5 text-xs text-muted-foreground">
+                            <CalendarClock
+                                className="size-3.5 shrink-0"
+                                strokeWidth={1.75}
+                                aria-hidden="true"
+                            />
+                            <span>
+                                Dynamic checkpoints can be added once this event proposal is
+                                APPROVED, and opened for scanning once PUBLISHED.
+                            </span>
+                        </div>
+                    ) : null}
+
+                    {canMutate && isSuperAdmin ? (
                         <div className="flex flex-col gap-1.5 rounded-md border border-warning/40 bg-warning/10 p-3">
                             <label
                                 htmlFor="hub-cp-bg-reason"
@@ -457,7 +550,7 @@ export function EventAttendanceTab({
                         </div>
                     ) : null}
 
-                    {canManage && showAddCp ? (
+                    {canCreateCheckpoint && showAddCp ? (
                         <form
                             onSubmit={handleCreateCheckpoint}
                             className="grid gap-3 rounded-md border border-border bg-muted/50 p-3.5 sm:grid-cols-4"
@@ -566,12 +659,17 @@ export function EventAttendanceTab({
                                                     <span>Scan Checkpoint</span>
                                                 </Link>
                                             ) : null}
-                                            {canManage && cp.status !== "OPEN" ? (
+                                            {canMutate && cp.status !== "OPEN" ? (
                                                 <Button
                                                     type="button"
                                                     variant="secondary"
                                                     size="sm"
-                                                    disabled={busy}
+                                                    disabled={busy || !canOpenCheckpoint}
+                                                    title={
+                                                        !canOpenCheckpoint
+                                                            ? "Event must be PUBLISHED before opening checkpoints."
+                                                            : undefined
+                                                    }
                                                     onClick={() =>
                                                         void handleToggleCheckpointStatus(
                                                             cp,
@@ -582,7 +680,7 @@ export function EventAttendanceTab({
                                                     Open
                                                 </Button>
                                             ) : null}
-                                            {canManage && cp.status === "OPEN" ? (
+                                            {canMutate && cp.status === "OPEN" ? (
                                                 <Button
                                                     type="button"
                                                     variant="secondary"
@@ -607,7 +705,7 @@ export function EventAttendanceTab({
                 </CardContent>
             </Card>
 
-            {canManage && overrideMode ? (
+            {canMutate && overrideMode ? (
                 <Card>
                     <CardHeader>
                         <CardTitle>
@@ -838,14 +936,14 @@ export function EventAttendanceTab({
                                 <th className="px-4 py-3">Checkpoint</th>
                                 <th className="px-4 py-3">Status</th>
                                 <th className="px-4 py-3">Recorded (PHT)</th>
-                                {canManage ? <th className="px-4 py-3 text-right">Action</th> : null}
+                                {canMutate ? <th className="px-4 py-3 text-right">Action</th> : null}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border">
                             {records.length === 0 ? (
                                 <tr>
                                     <td
-                                        colSpan={canManage ? 6 : 5}
+                                        colSpan={canMutate ? 6 : 5}
                                         className="px-4 py-10 text-center text-muted-foreground"
                                     >
                                         No attendance records found.
@@ -867,7 +965,7 @@ export function EventAttendanceTab({
                                         <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
                                             {formatManilaTimestamp(rec.recordedAt)}
                                         </td>
-                                        {canManage ? (
+                                        {canMutate ? (
                                             <td className="px-4 py-3 text-right">
                                                 <Button
                                                     type="button"

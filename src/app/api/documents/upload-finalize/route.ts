@@ -36,14 +36,12 @@ export async function POST(request: Request) {
         const body = await request.json().catch(() => null);
         const input = uploadFinalizeSchema.parse(body);
 
-        if (!session?.user) {
-            await authorize(
-                { actor: null, breakGlass: input.breakGlass, reason: input.reason },
-                "document:upload",
-                {},
-                createDrizzleAuthorizeDeps(db),
-            );
-        }
+        const baseAuth = await authorize(
+            { actor: session?.user ?? null, breakGlass: input.breakGlass, reason: input.reason },
+            "document:upload",
+            {},
+            createDrizzleAuthorizeDeps(db),
+        );
 
         const env = getEnv();
         const now = new Date();
@@ -57,7 +55,7 @@ export async function POST(request: Request) {
         }
 
         const intent = intentResult.payload;
-        if (intent.actorId !== session!.user.id) {
+        if (intent.actorId !== baseAuth.actor.id) {
             return apiError(
                 403,
                 "FORBIDDEN",
@@ -222,7 +220,7 @@ export async function POST(request: Request) {
             if (duplicateCheck) {
                 cleanupDriveFileId = null;
                 throw new DriveServiceError(
-                    409 as 400,
+                    409,
                     "DUPLICATE_DRIVE_FILE",
                     "This Google Drive file has already been registered.",
                 );

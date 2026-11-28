@@ -4,6 +4,7 @@ import { attendanceRecords, users } from "@/db/schema";
 import { isPgUniqueViolation } from "@/lib/admin/settings";
 import { writeAuditLog } from "@/lib/audit";
 import {
+    isTargetActiveOfficerForTerm,
     loadCheckpointContext,
     manualOverrideCreateSchema,
     manualOverridePatchSchema,
@@ -68,6 +69,22 @@ export async function POST(request: Request) {
 
         if (!target) {
             return apiError(404, "STUDENT_NOT_FOUND", "Student ID not found in active masterlist.");
+        }
+
+        const targetIsOfficer = await isTargetActiveOfficerForTerm(db, target, ctx.term.id);
+        if (ctx.checkpoint.audienceScope === "OFFICERS_ONLY" && !targetIsOfficer) {
+            return apiError(
+                400,
+                "AUDIENCE_MISMATCH",
+                "Checkpoint is restricted to active Officers and Executives.",
+            );
+        }
+        if (ctx.checkpoint.audienceScope === "GENERAL_MEMBERS" && targetIsOfficer) {
+            return apiError(
+                400,
+                "AUDIENCE_MISMATCH",
+                "Checkpoint is restricted to General Members.",
+            );
         }
 
         const now = new Date();

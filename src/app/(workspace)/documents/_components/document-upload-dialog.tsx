@@ -245,6 +245,8 @@ function DocumentUploadDialogBody({
                 }
                 toast.success("Google Drive link registered.");
                 onSuccess(payload.data.document);
+            } catch {
+                setErrorMsg("Network error while registering Google Drive link. Please try again.");
             } finally {
                 setPhase("idle");
             }
@@ -253,6 +255,17 @@ function DocumentUploadDialogBody({
 
         if (!selectedFile) {
             setErrorMsg("Select a file to upload.");
+            return;
+        }
+
+        const fileCheck = validateUploadFileDescriptor({
+            filename: selectedFile.name,
+            mimeType: selectedFile.type || "application/octet-stream",
+            fileSizeBytes: selectedFile.size,
+            maxUploadSizeBytes,
+        });
+        if (!fileCheck.ok) {
+            setErrorMsg(fileCheck.message);
             return;
         }
 
@@ -269,7 +282,7 @@ function DocumentUploadDialogBody({
                     isProposalAttachment: Boolean(effectiveEvent && isProposalAttachment),
                     initialStatus,
                     filename: selectedFile.name,
-                    mimeType: selectedFile.type || "application/octet-stream",
+                    mimeType: fileCheck.canonicalMimeType,
                     fileSizeBytes: selectedFile.size,
                     ...bgPayload,
                 }),
@@ -291,7 +304,7 @@ function DocumentUploadDialogBody({
             const putRes = await fetch(initPayload.data.uploadUrl, {
                 method: "PUT",
                 headers: {
-                    "Content-Type": selectedFile.type || "application/octet-stream",
+                    "Content-Type": fileCheck.canonicalMimeType,
                 },
                 body: selectedFile,
             });
@@ -329,6 +342,8 @@ function DocumentUploadDialogBody({
 
             toast.success("Document uploaded and classified in Google Drive.");
             onSuccess(finalizePayload.data.document);
+        } catch {
+            setErrorMsg("Network error during upload. Check your connection and try again.");
         } finally {
             setPhase("idle");
         }

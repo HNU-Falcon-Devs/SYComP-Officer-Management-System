@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ACCOUNT_STATUSES, SYSTEM_ROLES } from "@/config/permissions";
 import { getDb } from "@/db";
 import { academicTerms, officerAppointments, users } from "@/db/schema";
+import { escapeLikePattern } from "@/lib/admin/audit-logs";
 import { authorize, createDrizzleAuthorizeDeps } from "@/lib/auth/authorize";
 import { apiErrorResponse, getServerSession } from "@/lib/auth/server";
 import { formatCsvRow } from "@/lib/security/csv-safe";
@@ -35,7 +36,7 @@ export async function GET(request: Request) {
 
         const conditions = [];
         if (parsed.q) {
-            const pattern = `%${parsed.q}%`;
+            const pattern = `%${escapeLikePattern(parsed.q)}%`;
             conditions.push(
                 or(
                     ilike(users.studentIdNumber, pattern),

@@ -197,6 +197,12 @@ export function MeetingDetailWorkspace({
         meeting.academicTerm.status === "CLOSED" ||
         meeting.status === "COMPLETED" ||
         meeting.status === "CANCELLED";
+    const canMutate = !isLocked || isSuperAdmin;
+    const canManageMutate = canManage && canMutate;
+    const canOpenCheckpoint =
+        meeting.status === "SCHEDULED" ||
+        meeting.status === "ONGOING" ||
+        (meeting.status === "COMPLETED" && isSuperAdmin);
 
     const canEditMinutes =
         userRole === "SUPER_ADMIN" ||
@@ -205,35 +211,42 @@ export function MeetingDetailWorkspace({
                 (userRole === "OFFICER" && hasActiveAppointment)));
 
     const refreshMeetingBundle = useCallback(async () => {
-        const res = await fetch(`${ROUTES.api.meetings}/${meeting.id}`);
-        const payload = (await res.json()) as {
-            data?: {
-                meeting: MeetingDetailDto;
-                checkpoints: CheckpointDto[];
-                documents: DocumentDto[];
+        try {
+            const res = await fetch(`${ROUTES.api.meetings}/${meeting.id}`);
+            const payload = (await res.json()) as {
+                data?: {
+                    meeting: MeetingDetailDto;
+                    checkpoints: CheckpointDto[];
+                    documents: DocumentDto[];
+                };
+                error?: { message?: string };
             };
-        };
-        if (res.ok && payload.data) {
-            setMeeting(payload.data.meeting);
-            setCheckpoints(payload.data.checkpoints);
-            setDocs(payload.data.documents);
-            setOverrideCheckpointId((prev) => prev || payload.data!.checkpoints[0]?.id || "");
-        }
-
-        const recRes = await fetch(
-            `${ROUTES.api.attendance.records}?${new URLSearchParams({
-                meetingId: meeting.id,
-                page: "1",
-                limit: "25",
-            }).toString()}`,
-        );
-        if (recRes.ok) {
-            const recPayload = (await recRes.json()) as {
-                data?: { items: AttendanceRecordDto[] };
-            };
-            if (recPayload.data) {
-                setAttendance(recPayload.data.items);
+            if (!res.ok || !payload.data) {
+                setErrorMsg(payload.error?.message ?? "Failed to refresh meeting data.");
+            } else {
+                setMeeting(payload.data.meeting);
+                setCheckpoints(payload.data.checkpoints);
+                setDocs(payload.data.documents);
+                setOverrideCheckpointId((prev) => prev || payload.data!.checkpoints[0]?.id || "");
             }
+
+            const recRes = await fetch(
+                `${ROUTES.api.attendance.records}?${new URLSearchParams({
+                    meetingId: meeting.id,
+                    page: "1",
+                    limit: "25",
+                }).toString()}`,
+            );
+            if (recRes.ok) {
+                const recPayload = (await recRes.json()) as {
+                    data?: { items: AttendanceRecordDto[] };
+                };
+                if (recPayload.data) {
+                    setAttendance(recPayload.data.items);
+                }
+            }
+        } catch {
+            setErrorMsg("Network error while refreshing meeting details.");
         }
     }, [meeting.id]);
 
@@ -266,6 +279,8 @@ export function MeetingDetailWorkspace({
             setCancelOpen(false);
             setCancelReason("");
             toast.success(`Meeting status updated to ${nextStatus}.`);
+        } catch {
+            setErrorMsg("Network error while updating meeting status. Please try again.");
         } finally {
             setSavingTransition(false);
         }
@@ -303,6 +318,8 @@ export function MeetingDetailWorkspace({
             setMinutesBgReason("");
             setEditingMinutes(false);
             toast.success("Minutes of Meeting saved.");
+        } catch {
+            setErrorMsg("Network error while saving meeting minutes. Please try again.");
         } finally {
             setSavingMinutes(false);
         }
@@ -335,6 +352,8 @@ export function MeetingDetailWorkspace({
             setCpLabel("");
             setShowAddCp(false);
             await refreshMeetingBundle();
+        } catch {
+            setErrorMsg("Network error while creating checkpoint. Please try again.");
         } finally {
             setSavingCp(false);
         }
@@ -367,6 +386,8 @@ export function MeetingDetailWorkspace({
             }
             toast.success(`Checkpoint "${cp.label}" is now ${nextStatus}.`);
             await refreshMeetingBundle();
+        } catch {
+            setErrorMsg("Network error while updating checkpoint. Please try again.");
         } finally {
             setTogglingCpId(null);
         }
@@ -410,6 +431,8 @@ export function MeetingDetailWorkspace({
             setOverrideStudentId("");
             setOverrideReason("");
             await refreshMeetingBundle();
+        } catch {
+            setErrorMsg("Network error while saving officer attendance. Please try again.");
         } finally {
             setSavingOverride(false);
         }
@@ -457,19 +480,17 @@ export function MeetingDetailWorkspace({
                         </div>
                     </div>
 
-                    {canManage ? (
+                    {canManageMutate ? (
                         <div className="flex flex-wrap gap-2">
-                            {(!isLocked || isSuperAdmin) ? (
-                                <Button
-                                    type="button"
-                                    variant="secondary"
-                                    size="sm"
-                                    onClick={() => setEditOpen(true)}
-                                >
-                                    <Pencil className="size-3.5" strokeWidth={1.75} aria-hidden="true" />
-                                    <span>Edit Details</span>
-                                </Button>
-                            ) : null}
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => setEditOpen(true)}
+                            >
+                                <Pencil className="size-3.5" strokeWidth={1.75} aria-hidden="true" />
+                                <span>Edit Details</span>
+                            </Button>
                             {meeting.status === "SCHEDULED" ? (
                                 <>
                                     <Button
@@ -535,6 +556,19 @@ export function MeetingDetailWorkspace({
                 </div>
             </div>
 
+            {isLocked && !isSuperAdmin ? (
+                <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/50 px-3.5 py-2.5 text-xs text-muted-foreground">
+                    <Lock className="size-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
+                    <span>
+                        Read-only record: this meeting is{" "}
+                        {meeting.academicTerm.status === "CLOSED"
+                            ? "in a closed academic term"
+                            : meeting.status.toLowerCase()}
+                        . Only Super Admin break-glass overrides can modify locked meetings.
+                    </span>
+                </div>
+            ) : null}
+
             {errorMsg ? (
                 <div
                     role="alert"
@@ -546,7 +580,7 @@ export function MeetingDetailWorkspace({
                 </div>
             ) : null}
 
-            {canManage && cancelOpen && meeting.status === "SCHEDULED" ? (
+            {canManageMutate && cancelOpen && meeting.status === "SCHEDULED" ? (
                 <Card>
                     <CardHeader>
                         <CardTitle>Cancel Officer Meeting</CardTitle>
@@ -715,7 +749,7 @@ export function MeetingDetailWorkspace({
                             <Download className="size-3.5" strokeWidth={1.75} aria-hidden="true" />
                             <span>Export CSV</span>
                         </a>
-                        {canManage ? (
+                        {canManageMutate ? (
                             <>
                                 <Button
                                     type="button"
@@ -751,7 +785,7 @@ export function MeetingDetailWorkspace({
                 </CardHeader>
 
                 <CardContent className="flex flex-col gap-4">
-                    {canManage && isSuperAdmin ? (
+                    {canManageMutate && isSuperAdmin ? (
                         <div className="flex flex-col gap-1.5 rounded-md border border-warning/40 bg-warning/10 p-3">
                             <label
                                 htmlFor="mtg-cp-bg-reason"
@@ -769,7 +803,7 @@ export function MeetingDetailWorkspace({
                         </div>
                     ) : null}
 
-                    {canManage && showAddCp ? (
+                    {canManageMutate && showAddCp ? (
                         <form
                             onSubmit={handleCreateCheckpoint}
                             className="grid gap-3 rounded-md border border-border bg-muted/40 p-3.5 sm:grid-cols-4"
@@ -857,7 +891,9 @@ export function MeetingDetailWorkspace({
                                                     <span>Scan Checkpoint</span>
                                                 </Link>
                                             ) : null}
-                                            {canManage && cp.status !== "OPEN" ? (
+                                            {canManageMutate &&
+                                            cp.status !== "OPEN" &&
+                                            canOpenCheckpoint ? (
                                                 <Button
                                                     type="button"
                                                     variant="secondary"
@@ -870,7 +906,7 @@ export function MeetingDetailWorkspace({
                                                     Open
                                                 </Button>
                                             ) : null}
-                                            {canManage && cp.status === "OPEN" ? (
+                                            {canManageMutate && cp.status === "OPEN" ? (
                                                 <Button
                                                     type="button"
                                                     variant="secondary"
@@ -890,7 +926,7 @@ export function MeetingDetailWorkspace({
                         </div>
                     )}
 
-                    {canManage && overrideMode ? (
+                    {canManageMutate && overrideMode ? (
                         <form
                             onSubmit={handleOverrideSubmit}
                             className="grid gap-3 rounded-lg border border-border bg-muted/40 p-4 md:grid-cols-4"
@@ -1011,7 +1047,9 @@ export function MeetingDetailWorkspace({
                                         <th className="px-4 py-2.5">Checkpoint</th>
                                         <th className="px-4 py-2.5">Status</th>
                                         <th className="px-4 py-2.5">Recorded (PHT)</th>
-                                        {canManage ? <th className="px-4 py-2.5 text-right">Edit</th> : null}
+                                        {canManageMutate ? (
+                                            <th className="px-4 py-2.5 text-right">Edit</th>
+                                        ) : null}
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-border">
@@ -1034,7 +1072,7 @@ export function MeetingDetailWorkspace({
                                             <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">
                                                 {formatManilaTimestamp(rec.recordedAt)}
                                             </td>
-                                            {canManage ? (
+                                            {canManageMutate ? (
                                                 <td className="px-4 py-2.5 text-right">
                                                     <Button
                                                         type="button"
@@ -1072,21 +1110,27 @@ export function MeetingDetailWorkspace({
                             .
                         </CardDescription>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => setUploadMode("external")}
-                        >
-                            <Link2 className="size-3.5" strokeWidth={1.75} aria-hidden="true" />
-                            <span>Link Drive URL</span>
-                        </Button>
-                        <Button type="button" size="sm" onClick={() => setUploadMode("upload")}>
-                            <FileUp className="size-3.5" strokeWidth={1.75} aria-hidden="true" />
-                            <span>Upload Minutes</span>
-                        </Button>
-                    </div>
+                    {canMutate ? (
+                        <div className="flex flex-wrap gap-2">
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => setUploadMode("external")}
+                            >
+                                <Link2 className="size-3.5" strokeWidth={1.75} aria-hidden="true" />
+                                <span>Link Drive URL</span>
+                            </Button>
+                            <Button
+                                type="button"
+                                size="sm"
+                                onClick={() => setUploadMode("upload")}
+                            >
+                                <FileUp className="size-3.5" strokeWidth={1.75} aria-hidden="true" />
+                                <span>Upload Minutes</span>
+                            </Button>
+                        </div>
+                    ) : null}
                 </CardHeader>
 
                 <CardContent className="p-0">

@@ -199,7 +199,11 @@ export async function ensureDriveFolderHierarchy(
             .where(eq(driveFolderCache.pathKey, segmentKey))
             .limit(1);
 
-        if (cachedSeg && (await provider.verifyFolder(cachedSeg.driveFolderId))) {
+        if (
+            cachedSeg &&
+            cachedSeg.parentDriveFolderId === currentParentId &&
+            (await provider.verifyFolder(cachedSeg.driveFolderId))
+        ) {
             currentParentId = cachedSeg.driveFolderId;
             leafRow = cachedSeg;
             continue;

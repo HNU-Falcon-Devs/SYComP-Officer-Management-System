@@ -91,12 +91,14 @@ const NAV_GROUPS: readonly NavGroup[] = [
                 href: ROUTES.workspace.meetings,
                 icon: UsersRound,
                 roles: ALL_OPERATIONAL,
+                implementedInM2: true,
             },
             {
                 label: "Documents",
                 href: ROUTES.workspace.documents,
                 icon: FolderOpen,
                 roles: ALL_OPERATIONAL,
+                implementedInM2: true,
             },
             {
                 label: "Announcements",
@@ -427,19 +429,25 @@ export function ShellB({ actor, activeTerm, children }: ShellBProps) {
                             <span className="text-sm font-medium text-muted-foreground">
                                 {pathname === ROUTES.workspace.scanner
                                     ? "QR Scanner"
-                                    : pathname === ROUTES.workspace.account
-                                      ? "Account Security"
-                                    : pathname === ROUTES.admin.terms
-                                      ? "Terms & Officers"
-                                      : pathname === ROUTES.admin.masterlist
-                                        ? "Masterlist Import"
-                                        : pathname === ROUTES.workspace.directory
-                                          ? "Directory"
-                                          : pathname === ROUTES.admin.auditLogs
-                                            ? "Audit Logs"
-                                            : pathname === ROUTES.admin.settings
-                                              ? "System Settings"
-                                              : "Workspace"}
+                                    : pathname === ROUTES.workspace.documents ||
+                                        pathname.startsWith(`${ROUTES.workspace.documents}/`)
+                                      ? "Documents"
+                                      : pathname === ROUTES.workspace.meetings ||
+                                          pathname.startsWith(`${ROUTES.workspace.meetings}/`)
+                                        ? "Officer Meetings"
+                                        : pathname === ROUTES.workspace.account
+                                          ? "Account Security"
+                                          : pathname === ROUTES.admin.terms
+                                            ? "Terms & Officers"
+                                            : pathname === ROUTES.admin.masterlist
+                                              ? "Masterlist Import"
+                                              : pathname === ROUTES.workspace.directory
+                                                ? "Directory"
+                                                : pathname === ROUTES.admin.auditLogs
+                                                  ? "Audit Logs"
+                                                  : pathname === ROUTES.admin.settings
+                                                    ? "System Settings"
+                                                    : "Workspace"}
                             </span>
                         </div>
 

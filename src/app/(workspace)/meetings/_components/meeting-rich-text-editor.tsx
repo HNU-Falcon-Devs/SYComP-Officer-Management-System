@@ -342,7 +342,7 @@ export function MeetingRichTextEditor({
                     <button
                         type="button"
                         onClick={() => setTab("write")}
-                        className={`inline-flex min-h-8 items-center gap-1 rounded px-2.5 font-medium ${
+                        className={`inline-flex min-h-11 items-center gap-1 rounded px-2.5 font-medium sm:min-h-8 ${
                             tab === "write"
                                 ? "bg-card text-foreground"
                                 : "text-muted-foreground hover:text-foreground"
@@ -354,7 +354,7 @@ export function MeetingRichTextEditor({
                     <button
                         type="button"
                         onClick={() => setTab("preview")}
-                        className={`inline-flex min-h-8 items-center gap-1 rounded px-2.5 font-medium ${
+                        className={`inline-flex min-h-11 items-center gap-1 rounded px-2.5 font-medium sm:min-h-8 ${
                             tab === "preview"
                                 ? "bg-card text-foreground"
                                 : "text-muted-foreground hover:text-foreground"
@@ -375,7 +375,7 @@ export function MeetingRichTextEditor({
                             title="Heading 2"
                             aria-label="Insert heading 2"
                             onClick={() => insertWrap("<h2>", "</h2>\n", "Section Heading")}
-                            className="inline-flex size-8 items-center justify-center rounded text-muted-foreground hover:bg-card hover:text-foreground disabled:opacity-50"
+                            className="inline-flex size-11 items-center justify-center rounded text-muted-foreground hover:bg-card hover:text-foreground disabled:opacity-50 sm:size-8"
                         >
                             <Heading2 className="size-4" strokeWidth={1.75} aria-hidden="true" />
                         </button>
@@ -385,7 +385,7 @@ export function MeetingRichTextEditor({
                             title="Heading 3"
                             aria-label="Insert heading 3"
                             onClick={() => insertWrap("<h3>", "</h3>\n", "Subheading")}
-                            className="inline-flex size-8 items-center justify-center rounded text-muted-foreground hover:bg-card hover:text-foreground disabled:opacity-50"
+                            className="inline-flex size-11 items-center justify-center rounded text-muted-foreground hover:bg-card hover:text-foreground disabled:opacity-50 sm:size-8"
                         >
                             <Heading3 className="size-4" strokeWidth={1.75} aria-hidden="true" />
                         </button>
@@ -395,7 +395,7 @@ export function MeetingRichTextEditor({
                             title="Bold"
                             aria-label="Bold text"
                             onClick={() => insertWrap("<strong>", "</strong>", "bold text")}
-                            className="inline-flex size-8 items-center justify-center rounded text-muted-foreground hover:bg-card hover:text-foreground disabled:opacity-50"
+                            className="inline-flex size-11 items-center justify-center rounded text-muted-foreground hover:bg-card hover:text-foreground disabled:opacity-50 sm:size-8"
                         >
                             <Bold className="size-4" strokeWidth={1.75} aria-hidden="true" />
                         </button>
@@ -405,7 +405,7 @@ export function MeetingRichTextEditor({
                             title="Italic"
                             aria-label="Italic text"
                             onClick={() => insertWrap("<em>", "</em>", "italic text")}
-                            className="inline-flex size-8 items-center justify-center rounded text-muted-foreground hover:bg-card hover:text-foreground disabled:opacity-50"
+                            className="inline-flex size-11 items-center justify-center rounded text-muted-foreground hover:bg-card hover:text-foreground disabled:opacity-50 sm:size-8"
                         >
                             <Italic className="size-4" strokeWidth={1.75} aria-hidden="true" />
                         </button>
@@ -417,7 +417,7 @@ export function MeetingRichTextEditor({
                             onClick={() =>
                                 insertWrap("<ul>\n  <li>", "</li>\n</ul>\n", "Agenda item")
                             }
-                            className="inline-flex size-8 items-center justify-center rounded text-muted-foreground hover:bg-card hover:text-foreground disabled:opacity-50"
+                            className="inline-flex size-11 items-center justify-center rounded text-muted-foreground hover:bg-card hover:text-foreground disabled:opacity-50 sm:size-8"
                         >
                             <List className="size-4" strokeWidth={1.75} aria-hidden="true" />
                         </button>
@@ -429,7 +429,7 @@ export function MeetingRichTextEditor({
                             onClick={() =>
                                 insertWrap("<ol>\n  <li>", "</li>\n</ol>\n", "Action item")
                             }
-                            className="inline-flex size-8 items-center justify-center rounded text-muted-foreground hover:bg-card hover:text-foreground disabled:opacity-50"
+                            className="inline-flex size-11 items-center justify-center rounded text-muted-foreground hover:bg-card hover:text-foreground disabled:opacity-50 sm:size-8"
                         >
                             <ListOrdered className="size-4" strokeWidth={1.75} aria-hidden="true" />
                         </button>
@@ -441,7 +441,7 @@ export function MeetingRichTextEditor({
                             onClick={() =>
                                 insertWrap("<blockquote>", "</blockquote>\n", "Motion / Note")
                             }
-                            className="inline-flex size-8 items-center justify-center rounded text-muted-foreground hover:bg-card hover:text-foreground disabled:opacity-50"
+                            className="inline-flex size-11 items-center justify-center rounded text-muted-foreground hover:bg-card hover:text-foreground disabled:opacity-50 sm:size-8"
                         >
                             <Quote className="size-4" strokeWidth={1.75} aria-hidden="true" />
                         </button>
@@ -451,7 +451,7 @@ export function MeetingRichTextEditor({
                             title="Insert HTTPS link"
                             aria-label="Insert link"
                             onClick={insertLink}
-                            className="inline-flex size-8 items-center justify-center rounded text-muted-foreground hover:bg-card hover:text-foreground disabled:opacity-50"
+                            className="inline-flex size-11 items-center justify-center rounded text-muted-foreground hover:bg-card hover:text-foreground disabled:opacity-50 sm:size-8"
                         >
                             <Link2 className="size-4" strokeWidth={1.75} aria-hidden="true" />
                         </button>

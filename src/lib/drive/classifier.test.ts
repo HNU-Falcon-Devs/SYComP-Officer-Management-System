@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { DriveServiceError } from "./adapter";
 import {
     buildSafeDrivePreviewUrl,
     resolveDriveFolderPath,
@@ -292,5 +293,11 @@ describe("Google Drive classifier, validation, intent tokens, and provider", () 
         expect(oauthCalls).toHaveLength(1);
         const initCall = calls.find((c) => c.url.includes("uploadType=resumable"));
         expect(initCall?.headers?.origin).toBe("https://oms.sycomp.org");
+    });
+
+    it("preserves HTTP 409 conflict status on DriveServiceError without unsafe casts", () => {
+        const err = new DriveServiceError(409, "DUPLICATE_DRIVE_FILE", "Already finalized.");
+        expect(err.status).toBe(409);
+        expect(err.code).toBe("DUPLICATE_DRIVE_FILE");
     });
 });

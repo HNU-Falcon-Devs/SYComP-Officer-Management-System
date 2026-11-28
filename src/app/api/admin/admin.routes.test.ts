@@ -238,6 +238,18 @@ describe.skipIf(!directUrl)("M2A admin Terms, Masterlist, and Directory routes (
         const termA = (await createARes.json()).data.term;
         createdTermIds.push(termA.id);
 
+        // Duplicate term code returns 409 TERM_CONFLICT (unwrapping DrizzleQueryError cause)
+        const dupTermRes = await termsPost(
+            makeRequest("/api/admin/terms", "POST", {
+                code: codeA,
+                name: `Duplicate ${codeA}`,
+                startDate: "2028-01-01",
+                endDate: "2028-05-01",
+            }),
+        );
+        expect(dupTermRes.status).toBe(409);
+        expect(await dupTermRes.json()).toMatchObject({ error: { code: "TERM_CONFLICT" } });
+
         const actARes = await activateTermPost(
             makeRequest(`/api/admin/terms/${termA.id}/activate`, "POST", {}),
             { params: Promise.resolve({ id: termA.id }) },

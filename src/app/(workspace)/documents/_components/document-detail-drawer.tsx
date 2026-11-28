@@ -8,6 +8,7 @@ import {
     FileText,
     FolderTree,
     Info,
+    Lock,
     RotateCcw,
     X,
 } from "lucide-react";
@@ -87,8 +88,12 @@ function DocumentDetailDrawerBody({
             document.meeting?.status === "COMPLETED" ||
             document.meeting?.status === "CANCELLED",
     );
-    const availableTransitions = getAvailableDocumentTransitions(document.status, canApprove);
+    const canMutate = !isTermOrParentLocked || isSuperAdmin;
+    const availableTransitions = canMutate
+        ? getAvailableDocumentTransitions(document.status, canApprove)
+        : [];
     const canRename =
+        canMutate &&
         document.status !== "ARCHIVED" &&
         (document.status !== "APPROVED" || canApprove);
 
@@ -121,6 +126,8 @@ function DocumentDetailDrawerBody({
             toast.success("Document updated.");
             setPendingBreakGlass(null);
             onUpdated(body.data.document);
+        } catch {
+            setErrorMsg("Network error while updating document. Please try again.");
         } finally {
             setSaving(false);
         }
@@ -313,6 +320,16 @@ function DocumentDetailDrawerBody({
                                 </span>
                             </div>
                         )}
+
+                        {isTermOrParentLocked && !isSuperAdmin ? (
+                            <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/50 px-3.5 py-2.5 text-xs text-muted-foreground">
+                                <Lock className="size-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
+                                <span>
+                                    Read-only: this document belongs to a closed term or finalized
+                                    event/meeting.
+                                </span>
+                            </div>
+                        ) : null}
 
                         {canRename ? (
                             <form

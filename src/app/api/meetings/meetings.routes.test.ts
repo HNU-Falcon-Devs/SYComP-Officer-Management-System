@@ -298,6 +298,7 @@ describe.skipIf(!directUrl)("M4A Officer Meetings routes (local Supabase)", () =
     it("enforces meeting lifecycle transitions, open-checkpoint completion block, OFFICERS_ONLY attendance, CSV export, Minutes Drive attachment, and break-glass", async () => {
         const executive = await createTestUser("EXECUTIVE");
         const officer = await createTestUser("OFFICER", { withAppointment: true });
+        const member = await createTestUser("MEMBER");
         const superAdmin = await createTestUser("SUPER_ADMIN");
 
         // Executive creates and starts a meeting
@@ -337,6 +338,20 @@ describe.skipIf(!directUrl)("M4A Officer Meetings routes (local Supabase)", () =
             { params: Promise.resolve({ id: checkpointId }) },
         );
         expect(openCpRes.status).toBe(200);
+
+        // General MEMBER cannot be manually logged on an OFFICERS_ONLY meeting checkpoint -> 400 AUDIENCE_MISMATCH
+        const memberManualRes = await attendanceOverridePost(
+            makeJsonRequest("/api/attendance/override", "POST", {
+                checkpointId,
+                studentIdNumber: member.user.studentIdNumber,
+                status: "PRESENT",
+                editReason: "Testing audience mismatch guard",
+            }),
+        );
+        expect(memberManualRes.status).toBe(400);
+        expect(
+            ((await memberManualRes.json()) as { error: { code: string } }).error.code,
+        ).toBe("AUDIENCE_MISMATCH");
 
         // Executive logs officer attendance manually and exports formula-safe CSV
         const logRes = await attendanceOverridePost(

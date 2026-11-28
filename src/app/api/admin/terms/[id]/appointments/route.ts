@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getDb } from "@/db";
 import { academicTerms, officerAppointments, users } from "@/db/schema";
 import { recomputeUserSystemRole } from "@/lib/admin/role-sync";
+import { isPgUniqueViolation } from "@/lib/admin/settings";
 import { writeAuditLog } from "@/lib/audit";
 import { authorize, createDrizzleAuthorizeDeps } from "@/lib/auth/authorize";
 import {
@@ -222,12 +223,7 @@ export async function POST(
             201,
         );
     } catch (error) {
-        if (
-            typeof error === "object" &&
-            error !== null &&
-            "code" in error &&
-            error.code === "23505"
-        ) {
+        if (isPgUniqueViolation(error)) {
             return apiError(
                 409,
                 "APPOINTMENT_CONFLICT",

@@ -227,7 +227,7 @@ export function MasterlistImporter({
                                         <button
                                             type="button"
                                             onClick={() => setActiveTab("create")}
-                                            className={`min-h-10 rounded-md border px-3 text-xs font-medium transition-colors ${
+                                            className={`min-h-11 rounded-md border px-3 text-xs font-medium transition-colors sm:min-h-10 ${
                                                 activeTab === "create"
                                                     ? "border-primary bg-brand-soft text-primary dark:text-brand-accent"
                                                     : "border-border bg-muted text-muted-foreground"
@@ -238,7 +238,7 @@ export function MasterlistImporter({
                                         <button
                                             type="button"
                                             onClick={() => setActiveTab("existing")}
-                                            className={`min-h-10 rounded-md border px-3 text-xs font-medium transition-colors ${
+                                            className={`min-h-11 rounded-md border px-3 text-xs font-medium transition-colors sm:min-h-10 ${
                                                 activeTab === "existing"
                                                     ? "border-primary bg-brand-soft text-primary dark:text-brand-accent"
                                                     : "border-border bg-muted text-muted-foreground"
@@ -249,7 +249,7 @@ export function MasterlistImporter({
                                         <button
                                             type="button"
                                             onClick={() => setActiveTab("warnings")}
-                                            className={`min-h-10 rounded-md border px-3 text-xs font-medium transition-colors ${
+                                            className={`min-h-11 rounded-md border px-3 text-xs font-medium transition-colors sm:min-h-10 ${
                                                 activeTab === "warnings"
                                                     ? "border-primary bg-brand-soft text-primary dark:text-brand-accent"
                                                     : "border-border bg-muted text-muted-foreground"
@@ -263,7 +263,7 @@ export function MasterlistImporter({
                                     </div>
 
                                     <div className="flex flex-wrap items-center gap-3">
-                                        <label className="flex min-h-10 items-center gap-2 text-xs font-medium">
+                                        <label className="flex min-h-11 items-center gap-2 text-xs font-medium sm:min-h-10">
                                             <input
                                                 type="checkbox"
                                                 checked={flagMissing}
@@ -510,7 +510,7 @@ export function MasterlistImporter({
                                             <td className="px-4 py-3 text-right">
                                                 <a
                                                     href={`${ROUTES.api.adminMasterlist}/${item.id}/report`}
-                                                    className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-border bg-secondary px-3 text-xs font-medium text-secondary-foreground hover:bg-secondary/80"
+                                                    className="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-border bg-secondary px-3 text-xs font-medium text-secondary-foreground hover:bg-secondary/80 sm:min-h-9"
                                                 >
                                                     <Download
                                                         className="size-3.5"

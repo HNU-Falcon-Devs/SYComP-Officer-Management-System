@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { AlertCircle, FileUp, FolderOpen, Link2 } from "lucide-react";
+import { AlertCircle, FileUp, FolderOpen, Link2, Lock } from "lucide-react";
 import type { SystemRole } from "@/config/permissions";
 import { ROUTES } from "@/config/routes";
 import { formatManilaTimestamp } from "@/lib/admin/audit-logs";
@@ -48,47 +48,7 @@ export function EventDocumentsTab({
 
     const loadEventDocuments = useCallback(async () => {
         setErrorMsg(null);
-        const params = new URLSearchParams({
-            eventId,
-            includeMeta: "true",
-            page: "1",
-            limit: String(DOCUMENTS_DEFAULT_LIMIT),
-        });
-        const res = await fetch(`${ROUTES.api.documents}?${params.toString()}`);
-        const payload = (await res.json()) as {
-            data?: {
-                items: DocumentDto[];
-                meta?: {
-                    documentTypes: ActiveDocumentTypeOption[];
-                    activeTerm: DocumentTermOption | null;
-                    eventMeta: DocumentEventOption | null;
-                    driveShareMode: "domain" | "unlisted";
-                    maxUploadSizeBytes: number;
-                };
-            };
-            error?: { message?: string };
-        };
-
-        if (!res.ok || !payload.data) {
-            setErrorMsg(payload.error?.message ?? "Failed to load event documents.");
-            setLoading(false);
-            return;
-        }
-
-        setItems(payload.data.items);
-        if (payload.data.meta) {
-            setDocumentTypes(payload.data.meta.documentTypes);
-            setActiveTerm(payload.data.meta.activeTerm);
-            setEventMeta(payload.data.meta.eventMeta);
-            setDriveShareMode(payload.data.meta.driveShareMode);
-            setMaxUploadSizeBytes(payload.data.meta.maxUploadSizeBytes);
-        }
-        setLoading(false);
-    }, [eventId]);
-
-    useEffect(() => {
-        let cancelled = false;
-        async function loadInitial() {
+        try {
             const params = new URLSearchParams({
                 eventId,
                 includeMeta: "true",
@@ -109,21 +69,74 @@ export function EventDocumentsTab({
                 };
                 error?: { message?: string };
             };
-            if (cancelled) return;
 
             if (!res.ok || !payload.data) {
                 setErrorMsg(payload.error?.message ?? "Failed to load event documents.");
-            } else {
-                setItems(payload.data.items);
-                if (payload.data.meta) {
-                    setDocumentTypes(payload.data.meta.documentTypes);
-                    setActiveTerm(payload.data.meta.activeTerm);
-                    setEventMeta(payload.data.meta.eventMeta);
-                    setDriveShareMode(payload.data.meta.driveShareMode);
-                    setMaxUploadSizeBytes(payload.data.meta.maxUploadSizeBytes);
+                return;
+            }
+
+            setItems(payload.data.items);
+            if (payload.data.meta) {
+                setDocumentTypes(payload.data.meta.documentTypes);
+                setActiveTerm(payload.data.meta.activeTerm);
+                setEventMeta(payload.data.meta.eventMeta);
+                setDriveShareMode(payload.data.meta.driveShareMode);
+                setMaxUploadSizeBytes(payload.data.meta.maxUploadSizeBytes);
+            }
+        } catch {
+            setErrorMsg("Network error while loading event documents.");
+        } finally {
+            setLoading(false);
+        }
+    }, [eventId]);
+
+    useEffect(() => {
+        let cancelled = false;
+        async function loadInitial() {
+            try {
+                const params = new URLSearchParams({
+                    eventId,
+                    includeMeta: "true",
+                    page: "1",
+                    limit: String(DOCUMENTS_DEFAULT_LIMIT),
+                });
+                const res = await fetch(`${ROUTES.api.documents}?${params.toString()}`);
+                const payload = (await res.json()) as {
+                    data?: {
+                        items: DocumentDto[];
+                        meta?: {
+                            documentTypes: ActiveDocumentTypeOption[];
+                            activeTerm: DocumentTermOption | null;
+                            eventMeta: DocumentEventOption | null;
+                            driveShareMode: "domain" | "unlisted";
+                            maxUploadSizeBytes: number;
+                        };
+                    };
+                    error?: { message?: string };
+                };
+                if (cancelled) return;
+
+                if (!res.ok || !payload.data) {
+                    setErrorMsg(payload.error?.message ?? "Failed to load event documents.");
+                } else {
+                    setItems(payload.data.items);
+                    if (payload.data.meta) {
+                        setDocumentTypes(payload.data.meta.documentTypes);
+                        setActiveTerm(payload.data.meta.activeTerm);
+                        setEventMeta(payload.data.meta.eventMeta);
+                        setDriveShareMode(payload.data.meta.driveShareMode);
+                        setMaxUploadSizeBytes(payload.data.meta.maxUploadSizeBytes);
+                    }
+                }
+            } catch {
+                if (!cancelled) {
+                    setErrorMsg("Network error while loading event documents.");
+                }
+            } finally {
+                if (!cancelled) {
+                    setLoading(false);
                 }
             }
-            setLoading(false);
         }
         void loadInitial();
         return () => {
@@ -140,7 +153,15 @@ export function EventDocumentsTab({
         );
     }
 
-    const canUpload = userRole === "OFFICER" || userRole === "EXECUTIVE" || userRole === "SUPER_ADMIN";
+    const isSuperAdmin = userRole === "SUPER_ADMIN";
+    const isLocked =
+        eventStatus === "COMPLETED" ||
+        eventStatus === "REJECTED" ||
+        eventMeta?.academicTermStatus === "CLOSED";
+    const canUpload =
+        (userRole === "OFFICER" || userRole === "EXECUTIVE" || userRole === "SUPER_ADMIN") &&
+        (!isLocked || isSuperAdmin) &&
+        Boolean(eventMeta);
 
     return (
         <div className="flex flex-col gap-6">
@@ -188,6 +209,15 @@ export function EventDocumentsTab({
                 </CardHeader>
 
                 <CardContent className="p-0">
+                    {isLocked && !isSuperAdmin ? (
+                        <div className="flex items-center gap-2 border-t border-border bg-muted/50 px-4 py-2.5 text-xs text-muted-foreground">
+                            <Lock className="size-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
+                            <span>
+                                Documents are read-only for finalized events or closed academic
+                                terms. Only Super Admin break-glass overrides can attach new files.
+                            </span>
+                        </div>
+                    ) : null}
                     {items.length === 0 ? (
                         <div className="flex flex-col items-center justify-center gap-2 border-t border-border px-6 py-10 text-center">
                             <FolderOpen

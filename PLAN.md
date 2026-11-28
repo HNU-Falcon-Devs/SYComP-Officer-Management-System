@@ -15,34 +15,34 @@
 ## Phase 0 — Shared Foundation (Sequential on `main`)
 
 ### M0: Harness, Tokens & Agent Setup `[Core — @itsMarchus]` · `chore/core-m0-harness`
-- [ ] Reconcile the 5 cross-document drifts in `docs/00`–`05` (hashing, Drive OAuth2, Executive-only checkpoints, no in-app dispute queue, 21-table parity)
-- [ ] Scaffold Next.js App Router (`TypeScript` strict, `pnpm`) + Tailwind CSS + Shadcn/ui + `lucide-react` + `next-themes` + `sonner`
-- [ ] Configure SYComP Light/Dark CSS tokens (`docs/05` Sec 2.2) and `Inter` + `JetBrains Mono` fonts in `src/app/globals.css`
-- [ ] Create `src/config/env.ts` (Zod-validated), `src/config/routes.ts`, and `src/config/permissions.ts`
-- [ ] Configure ESLint, Prettier, Vitest (wired to real local/dev PostgreSQL via `DIRECT_DATABASE_URL`), and `.github/workflows/ci.yml` (`typecheck` + `lint` + `test`)
-- [ ] Commit `AGENTS.md`, `PLAN.md`, `.agents/skills/impeccable/SKILL.md`, `.agents/rules/ui-standards.md`, and `.github/CODEOWNERS`
-- [ ] **Gate:** `pnpm typecheck`, `pnpm lint`, and smoke test pass on CI; Antigravity and Codex both discover `AGENTS.md` and `impeccable`
+- [x] Reconcile the 5 cross-document drifts in `docs/00`–`05` (hashing, Drive OAuth2, Executive-only checkpoints, no in-app dispute queue, 21-table parity)
+- [x] Scaffold Next.js App Router (`TypeScript` strict, `pnpm`) + Tailwind CSS + Shadcn/ui + `lucide-react` + `next-themes` + `sonner`
+- [x] Configure SYComP Light/Dark CSS tokens (`docs/05` Sec 2.2) and `Inter` + `JetBrains Mono` fonts in `src/app/globals.css`
+- [x] Create `src/config/env.ts` (Zod-validated), `src/config/routes.ts`, and `src/config/permissions.ts`
+- [x] Configure ESLint, Prettier, Vitest (wired to real local/dev PostgreSQL via `DIRECT_DATABASE_URL`), and `.github/workflows/validation.yml` (`lint` + `typecheck` + `test` + `build`)
+- [x] Commit `AGENTS.md`, `PLAN.md`, `.agents/skills/impeccable/SKILL.md`, `.agents/rules/ui-standards.md`, and `.github/CODEOWNERS`
+- [x] **Gate:** `pnpm typecheck`, `pnpm lint`, and smoke test pass on CI; Antigravity and Codex both discover `AGENTS.md` and `impeccable`
 
 ### M1: 21-Table Schema & Security Core `[Core — @itsMarchus]` · `chore/core-m1-schema-security`
-- [ ] Define all 21 Drizzle tables in `src/db/schema/` (19 domain entities + `user_sessions` + `rate_limit_buckets`) with all `CHECK` constraints, partial unique indexes, and composite FKs (`docs/03`)
-- [ ] Configure `src/db/index.ts` (Supavisor transaction pooler `prepare: false`) and `drizzle.config.ts` (strictly `DIRECT_DATABASE_URL`)
-- [ ] Generate and apply initial SQL migration including the `audit_logs` `BEFORE UPDATE OR DELETE` immutability trigger and PostgREST RLS lockdown on all 21 tables (`docs/06` Sec 6.3)
-- [ ] Implement `src/lib/auth/password.ts` (`crypto.scrypt`, constant-time verify, surname normalizer) and `src/lib/auth/session.ts` (`user_sessions`, 24h/8h idle timeout, 7d cap, instant revocation)
-- [ ] Implement centralized 6-stage `src/lib/auth/authorize.ts` (Layers 0–3, temporal locks, and `SUPER_ADMIN` Break-Glass requiring `break_glass: true` + `reason >= 10 chars`)
-- [ ] Implement `src/lib/audit.ts` (transactional append-only writer + credential key redactor), `src/lib/security/rate-limit.ts`, `sanitize.ts` (`sanitize-html`), and `csv-safe.ts`
-- [ ] Implement `src/lib/email/` (`ConsoleEmailProvider`, `ResendEmailProvider`, `SmtpEmailProvider` with strict `UNIVERSITY_EMAIL_DOMAIN` check) and `src/db/seed.ts`
-- [ ] **Gate:** Core RBAC, session revocation, audit immutability, and constraint tests (`SEC-TEST-01`–`08` foundations) pass against real Postgres
+- [x] Define all 21 Drizzle tables in `src/db/schema/` (19 domain entities + `user_sessions` + `rate_limit_buckets`) with all `CHECK` constraints, partial unique indexes, and composite FKs (`docs/03`)
+- [x] Configure `src/db/index.ts` (Supavisor transaction pooler `prepare: false`) and `drizzle.config.ts` (strictly `DIRECT_DATABASE_URL`)
+- [x] Generate and apply initial SQL migration including the `audit_logs` `BEFORE UPDATE OR DELETE` immutability trigger and PostgREST RLS lockdown on all 21 tables (`docs/06` Sec 6.3)
+- [x] Implement `src/lib/auth/password.ts` (`crypto.scrypt`, constant-time verify, surname normalizer) and `src/lib/auth/session.ts` (`user_sessions`, 24h/8h idle timeout, 7d cap, instant revocation)
+- [x] Implement centralized 6-stage `src/lib/auth/authorize.ts` (Layers 0–3, temporal locks, and `SUPER_ADMIN` Break-Glass requiring `break_glass: true` + `reason >= 10 chars`)
+- [x] Implement `src/lib/audit.ts` (transactional append-only writer + credential key redactor), `src/lib/security/rate-limit.ts`, `sanitize.ts` (`sanitize-html`), and `csv-safe.ts`
+- [x] Implement `src/lib/email/` (`ConsoleEmailProvider`, `ResendEmailProvider`, `SmtpEmailProvider` with strict `UNIVERSITY_EMAIL_DOMAIN` check) and `src/db/seed.ts`
+- [x] **Gate:** Core RBAC, session revocation, audit immutability, and constraint tests (`SEC-TEST-01`–`08` foundations) pass against real Postgres
 
 ---
 
 ## Phase 1 — Parallel Feature Tracks (Branch from `main` after M1)
 
 ### M2A: Auth, Academic Terms & Masterlist `[Track A — @itsMarchus]` · `feat/a-auth-terms-masterlist`
-- [ ] Build `/login`, `/forgot-password`, `/account-hold`, and `/api/auth/*` (rate-limited login, non-enumeration errors, strict `UNIVERSITY_EMAIL_DOMAIN` 6-digit `HMAC-SHA256` OTP binding & password reset)
-- [ ] Build `/admin/terms` and `/api/admin/terms/*` (single-active-term atomic rollover, Officer Appointments CRUD, atomic `users.system_role` sync + session revocation on downgrade)
-- [ ] Build `/admin/masterlist` and `/api/admin/masterlist/*` (CSV/XLSX pre-commit duplicate/discrepancy preview + 200-row batched transactional commit + `NEEDS_REVIEW` flagging)
-- [ ] Build `/directory` (searchable active/historical Officers and General Members directory + `Super Admin` soft-disable/reactivation controls)
-- [ ] **Gate:** `AC-01`, `AC-08`, `SEC-TEST-05`, and `SEC-TEST-07` pass
+- [x] Build `/login`, `/forgot-password`, `/account-hold`, and `/api/auth/*` (rate-limited login, non-enumeration errors, strict `UNIVERSITY_EMAIL_DOMAIN` 6-digit `HMAC-SHA256` OTP binding & password reset)
+- [x] Build `/admin/terms` and `/api/admin/terms/*` (single-active-term atomic rollover, Officer Appointments CRUD, atomic `users.system_role` sync + session revocation on downgrade)
+- [x] Build `/admin/masterlist` and `/api/admin/masterlist/*` (CSV/XLSX pre-commit duplicate/discrepancy preview + 200-row batched transactional commit + `NEEDS_REVIEW` flagging)
+- [x] Build `/directory` (searchable active/historical Officers and General Members directory + `Super Admin` soft-disable/reactivation controls)
+- [x] **Gate:** `AC-01`, `AC-08`, `SEC-TEST-05`, and `SEC-TEST-07` pass
 
 ### M2B: Dual Shells, PWA & Member Portal `[Track B — @Syris-EkzD]` · `feat/b-shells-pwa-portal`
 - [ ] Build Shell A (`src/components/shells/`): mobile 5-tab bottom bar (`44x44px` touch targets), desktop top nav, theme toggle, and conditional first-login security onboarding banner
@@ -52,11 +52,11 @@
 - [ ] **Gate:** `AC-02` (`403` member isolation), zero-emoji Lucide audit, and mobile responsive checks pass
 
 ### M3A: Dynamic Attendance & 2-Step QR Scanner `[Track A — @itsMarchus]` · `feat/a-attendance-scanner`
-- [ ] Build Executive-only (plus `SUPER_ADMIN` break-glass) checkpoint CRUD and `SCHEDULED`/`OPEN`/`CLOSED` state toggle endpoints
-- [ ] Build `/api/attendance/lookup` (`< 300ms` non-mutating 5-state verification check) and `/api/attendance/confirm` (server-authoritative UTC log, duplicate guard, officer-attendance `403` guard, active-account guard)
-- [ ] Build `/scanner` (`html5-qrcode` camera viewfinder, 5-state Verification Card, manual ID fallback, live recent scans feed, offline submit block)
-- [ ] Build Executive manual attendance entry/override modal (mandatory `edit_reason` + audit log), formula-safe CSV export (`/api/attendance/export`), and `src/components/event-hub/attendance-tab.tsx`
-- [ ] **Gate:** `AC-06`, `AC-07`, `SEC-TEST-04`, and `< 1.5s` end-to-end scan latency verified
+- [x] Build Executive-only (plus `SUPER_ADMIN` break-glass) checkpoint CRUD and `SCHEDULED`/`OPEN`/`CLOSED` state toggle endpoints
+- [x] Build `/api/attendance/lookup` (`< 300ms` non-mutating 5-state verification check) and `/api/attendance/confirm` (server-authoritative UTC log, duplicate guard, officer-attendance `403` guard, active-account guard)
+- [x] Build `/scanner` (`html5-qrcode` camera viewfinder, 5-state Verification Card, manual ID fallback, live recent scans feed, offline submit block)
+- [x] Build Executive manual attendance entry/override modal (mandatory `edit_reason` + audit log), formula-safe CSV export (`/api/attendance/export`), and `src/components/event-hub/attendance-tab.tsx`
+- [x] **Gate:** `AC-06`, `AC-07`, `SEC-TEST-04`, and `< 1.5s` end-to-end scan latency verified
 
 ### M3B: Events, Committees, Tasks & Announcements `[Track B — @Syris-EkzD]` · `feat/b-events-tasks-announcements`
 - [ ] Build reusable Tiptap WYSIWYG editor (`src/components/editor/`) backed by server-side `sanitize-html`
@@ -67,12 +67,12 @@
 - [ ] **Gate:** `AC-03`, `AC-04`, `AC-05`, `SEC-TEST-02`, `SEC-TEST-03`, `SEC-TEST-06`, and `SEC-TEST-08` pass
 
 ### M4A: Google Drive Documents, Meetings & Audit UI `[Track A — @itsMarchus]` · `feat/a-drive-meetings-audit`
-- [ ] Build `src/lib/drive/classifier.ts` (`resolveDriveFolderPath`), OAuth2 Refresh Token client, `drive_folder_cache` traversal, and configurable `DRIVE_SHARE_MODE` (`domain` | `unlisted`)
-- [ ] Build 3-phase Direct-to-Drive resumable upload (`/api/documents/upload-init` with HMAC-signed `uploadIntentToken`, `/upload-finalize` verifying actual MIME/size/parent + compensating orphan cleanup, `/external`)
-- [ ] Build `/documents`, `/admin/settings` (dynamic `document_types` manager), and `src/components/event-hub/documents-tab.tsx`
-- [ ] Build isolated `/meetings` & `/meetings/[id]` (Executive scheduling, rich-text agenda/minutes, officer-only checkpoints, hard `403` for `MEMBER`)
-- [ ] Build `/admin/audit-logs` (searchable immutable ledger with redacted before/after JSON diff viewer)
-- [ ] **Gate:** `AC-09` and end-to-end 15 MB Direct-to-Drive upload + orphan-cleanup verified
+- [x] Build `src/lib/drive/classifier.ts` (`resolveDriveFolderPath`), OAuth2 Refresh Token client, `drive_folder_cache` traversal, and configurable `DRIVE_SHARE_MODE` (`domain` | `unlisted`)
+- [x] Build 3-phase Direct-to-Drive resumable upload (`/api/documents/upload-init` with HMAC-signed `uploadIntentToken`, `/upload-finalize` verifying actual MIME/size/parent + compensating orphan cleanup, `/external`)
+- [x] Build `/documents`, `/admin/settings` (dynamic `document_types` manager), and `src/components/event-hub/documents-tab.tsx`
+- [x] Build isolated `/meetings` & `/meetings/[id]` (Executive scheduling, rich-text agenda/minutes, officer-only checkpoints, hard `403` for `MEMBER`)
+- [x] Build `/admin/audit-logs` (searchable immutable ledger with redacted before/after JSON diff viewer)
+- [ ] **Gate:** `AC-09` and end-to-end 15 MB Direct-to-Drive upload + orphan-cleanup verified *(automated via MockDriveProvider + orphan-cleanup tests; live 15 MB Google Drive OAuth upload verified in M5 staging)*
 
 ---
 
