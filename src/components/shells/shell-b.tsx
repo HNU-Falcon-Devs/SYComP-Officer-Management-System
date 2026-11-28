@@ -79,6 +79,7 @@ const NAV_GROUPS: readonly NavGroup[] = [
                 href: ROUTES.workspace.events,
                 icon: CalendarDays,
                 roles: ALL_OPERATIONAL,
+                implementedInM2: true,
             },
             {
                 label: "My Tasks",
@@ -429,25 +430,28 @@ export function ShellB({ actor, activeTerm, children }: ShellBProps) {
                             <span className="text-sm font-medium text-muted-foreground">
                                 {pathname === ROUTES.workspace.scanner
                                     ? "QR Scanner"
-                                    : pathname === ROUTES.workspace.documents ||
-                                        pathname.startsWith(`${ROUTES.workspace.documents}/`)
-                                      ? "Documents"
-                                      : pathname === ROUTES.workspace.meetings ||
-                                          pathname.startsWith(`${ROUTES.workspace.meetings}/`)
-                                        ? "Officer Meetings"
-                                        : pathname === ROUTES.workspace.account
-                                          ? "Account Security"
-                                          : pathname === ROUTES.admin.terms
-                                            ? "Terms & Officers"
-                                            : pathname === ROUTES.admin.masterlist
-                                              ? "Masterlist Import"
-                                              : pathname === ROUTES.workspace.directory
-                                                ? "Directory"
-                                                : pathname === ROUTES.admin.auditLogs
-                                                  ? "Audit Logs"
-                                                  : pathname === ROUTES.admin.settings
-                                                    ? "System Settings"
-                                                    : "Workspace"}
+                                    : pathname === ROUTES.workspace.events ||
+                                        pathname.startsWith(`${ROUTES.workspace.events}/`)
+                                      ? "Events & Proposals"
+                                      : pathname === ROUTES.workspace.documents ||
+                                          pathname.startsWith(`${ROUTES.workspace.documents}/`)
+                                        ? "Documents"
+                                        : pathname === ROUTES.workspace.meetings ||
+                                            pathname.startsWith(`${ROUTES.workspace.meetings}/`)
+                                          ? "Officer Meetings"
+                                          : pathname === ROUTES.workspace.account
+                                            ? "Account Security"
+                                            : pathname === ROUTES.admin.terms
+                                              ? "Terms & Officers"
+                                              : pathname === ROUTES.admin.masterlist
+                                                ? "Masterlist Import"
+                                                : pathname === ROUTES.workspace.directory
+                                                  ? "Directory"
+                                                  : pathname === ROUTES.admin.auditLogs
+                                                    ? "Audit Logs"
+                                                    : pathname === ROUTES.admin.settings
+                                                      ? "System Settings"
+                                                      : "Workspace"}
                             </span>
                         </div>
 

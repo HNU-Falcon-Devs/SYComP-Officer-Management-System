@@ -4,6 +4,7 @@ import { ArrowRight, Calendar, ClipboardCheck, Globe, Megaphone, Pin } from "luc
 import { ROUTES } from "@/config/routes";
 import { getDb } from "@/db";
 import { academicTerms, announcements, attendanceRecords, events } from "@/db/schema";
+import { formatManilaTimestamp } from "@/lib/admin/audit-logs";
 import { requireServerAuth } from "@/lib/auth/server";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -140,7 +141,7 @@ export default async function PortalHomePage() {
                                             <p className="truncate text-sm font-medium">{item.title}</p>
                                             <p className="mt-0.5 text-xs text-muted-foreground">
                                                 <span className="font-mono">
-                                                    {item.startAt.toISOString().slice(0, 10)}
+                                                    {formatManilaTimestamp(item.startAt)}
                                                 </span>
                                                 {item.venue ? ` · ${item.venue}` : ""}
                                             </p>

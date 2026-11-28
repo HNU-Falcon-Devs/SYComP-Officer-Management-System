@@ -59,12 +59,12 @@
 - [x] **Gate:** `AC-06`, `AC-07`, `SEC-TEST-04`, and `< 1.5s` end-to-end scan latency verified
 
 ### M3B: Events, Committees, Tasks & Announcements `[Track B — @Syris-EkzD]` · `feat/b-events-tasks-announcements`
-- [ ] Build reusable Tiptap WYSIWYG editor (`src/components/editor/`) backed by server-side `sanitize-html`
-- [ ] Build `/events` (filterable list/calendar + Proposal Workspace), `/events/new`, and `/api/events/*` enforcing full proposal-to-archive state transitions and Executive publish gate
-- [ ] Build `/events/[slug]` Single Tabbed Event Hub (`Overview`, `Committees`, `Tasks`, plus mounting slots for `<EventAttendanceTab />` and `<EventDocumentsTab />` passing `{ eventId, eventStatus, userRole }`)
-- [ ] Build event-scoped Committees (single active Officer `Committee Head`, roster management) and `/tasks` (personal queue + committee/event deliverable board)
-- [ ] Build `/announcements` (`DRAFT`/`PUBLISHED`/`ARCHIVED`, `ALL_MEMBERS` vs `OFFICERS_ONLY`), role-aware `/dashboard` cockpits (`Officer`, `Executive`, `Super Admin`), and reusable `SUPER_ADMIN` Break-Glass confirmation modal
-- [ ] **Gate:** `AC-03`, `AC-04`, `AC-05`, `SEC-TEST-02`, `SEC-TEST-03`, `SEC-TEST-06`, and `SEC-TEST-08` pass
+- [x] Build reusable rich-text editor (`src/components/editor/rich-text-editor.tsx`) backed by server-side `sanitize-html` *(zero-dependency toolbar + safe React preview; `package.json` Locked Core untouched)*
+- [x] Build `/events` (filterable list/calendar + Proposal Workspace), `/events/new`, and `/api/events/*` enforcing full proposal-to-archive state transitions and Executive publish gate
+- [x] Build `/events/[slug]` Single Tabbed Event Hub (`Overview`, `Committees`, `Tasks` placeholder gate, plus mounting slots for `<EventAttendanceTab />` and `<EventDocumentsTab />` passing `{ eventId, eventStatus, userRole }`)
+- [ ] Build event-scoped Committees (single active Officer `Committee Head`, roster management) *(done on `feat/b-events-hub`)* and `/tasks` (personal queue + committee/event deliverable board) *(pending Tasks slice)*
+- [ ] Build `/announcements` (`DRAFT`/`PUBLISHED`/`ARCHIVED`, `ALL_MEMBERS` vs `OFFICERS_ONLY`), role-aware `/dashboard` cockpits (`Officer`, `Executive`, `Super Admin`), and reusable `SUPER_ADMIN` Break-Glass confirmation modal *(Break-Glass modal done at `src/components/ui/break-glass-modal.tsx`; `/announcements` & `/dashboard` pending)*
+- [ ] **Gate:** `AC-03`, `AC-04`, `AC-05`, `SEC-TEST-02`, `SEC-TEST-03`, `SEC-TEST-06`, and `SEC-TEST-08` pass *(Events/Committees criteria verified on `feat/b-events-hub`; Tasks/Announcements pending)*
 
 ### M4A: Google Drive Documents, Meetings & Audit UI `[Track A — @itsMarchus]` · `feat/a-drive-meetings-audit`
 - [x] Build `src/lib/drive/classifier.ts` (`resolveDriveFolderPath`), OAuth2 Refresh Token client, `drive_folder_cache` traversal, and configurable `DRIVE_SHARE_MODE` (`domain` | `unlisted`)
